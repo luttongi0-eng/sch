@@ -21,9 +21,54 @@ export default function Home() {
   const [showGridLines, setShowGridLines] = useState<boolean>(false);
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const [scale, setScale] = useState<number>(0.55);
+  const [isLoaded, setIsLoaded] = useState<boolean>(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const previewCanvasRef = useRef<HTMLDivElement>(null);
+
+  // 1. 첫 마운트 시 localStorage에서 이전에 저장된 스케줄 데이터 불러오기
+  useEffect(() => {
+    try {
+      const savedConfig = localStorage.getItem('crayoncast_config');
+      const savedDays = localStorage.getItem('crayoncast_days');
+
+      if (savedConfig) {
+        setConfig((prev) => ({ ...prev, ...JSON.parse(savedConfig) }));
+      }
+      if (savedDays) {
+        setDays(JSON.parse(savedDays));
+      }
+    } catch (e) {
+      console.warn('Failed to load saved schedule from localStorage:', e);
+    } finally {
+      setIsLoaded(true);
+    }
+  }, []);
+
+  // 2. config 또는 days 수정 시 localStorage에 실시간 자동 저장
+  useEffect(() => {
+    if (!isLoaded) return;
+    try {
+      localStorage.setItem('crayoncast_config', JSON.stringify(config));
+      localStorage.setItem('crayoncast_days', JSON.stringify(days));
+    } catch (e) {
+      console.warn('Failed to auto-save schedule to localStorage:', e);
+    }
+  }, [config, days, isLoaded]);
+
+  // 전체 데이터 초기화 함수
+  const handleResetToDefault = () => {
+    if (window.confirm('모든 일정 및 스타일 설정을 초기 상태로 되돌리시겠습니까?')) {
+      setConfig(INITIAL_CONFIG);
+      setDays(INITIAL_DAYS);
+      try {
+        localStorage.removeItem('crayoncast_config');
+        localStorage.removeItem('crayoncast_days');
+      } catch (e) {
+        // ignore
+      }
+    }
+  };
 
   // 반응형 Fit 비율 자동 계산 (1920x1080 컨테이너 크기에 맞춤)
   useEffect(() => {
@@ -117,8 +162,20 @@ export default function Home() {
           </div>
         </div>
 
-        {/* 우측 주요 내보내기 버튼 (DESIGN.md: High-contrast Charcoal Button) */}
-        <div className="flex items-center gap-3">
+        {/* 우측 주요 내보내기 버튼 및 초기화 버튼 */}
+        <div className="flex items-center gap-2.5">
+          <span className="text-[11px] text-[#8C847D] flex items-center gap-1 font-medium mr-1">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> 자동 저장됨
+          </span>
+
+          <button
+            onClick={handleResetToDefault}
+            title="초기 템플릿으로 되돌리기"
+            className="px-3 py-2 rounded-lg border border-[#E5DFD5] bg-[#F5F2EB] hover:bg-[#E5DFD5] text-[#5A544F] font-bold text-xs transition-all cursor-pointer"
+          >
+            초기화
+          </button>
+
           <button
             onClick={handleDownloadPng}
             disabled={isExporting}
