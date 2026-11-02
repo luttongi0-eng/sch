@@ -1,0 +1,251 @@
+import { DaySchedule, ScheduleConfig, ThemePreset } from '@/types/schedule';
+
+export const CRAYON_SWATCHES = [
+  { name: 'Crayon Coral', hex: '#FF7675' },
+  { name: 'Mustard Butter', hex: '#FDCB6E' },
+  { name: 'Leaf Mint', hex: '#55EFC4' },
+  { name: 'Sky Pastel', hex: '#74B9FF' },
+  { name: 'Lavender Dream', hex: '#A29BFE' },
+  { name: 'Warm Peach', hex: '#FAB1A0' },
+  { name: 'Ink Charcoal', hex: '#2C2825' },
+];
+
+export interface FontOption {
+  id: string;
+  name: string;
+  fontFamily: string;
+  category: string;
+  previewText: string;
+}
+
+export const FONT_OPTIONS: FontOption[] = [
+  {
+    id: 'default',
+    name: '기본 산세리프 (Plus Jakarta Sans & Pretendard)',
+    fontFamily: 'var(--font-plus-jakarta), Pretendard, sans-serif',
+    category: '모던/고딕',
+    previewText: '다람쥐 헌 쳇바퀴에 타고파',
+  },
+  {
+    id: 'ongleip',
+    name: '온글잎 박다현체',
+    fontFamily: 'OngleipParkDahyeon, sans-serif',
+    category: '손글씨/감성',
+    previewText: '따뜻한 일기장 같은 손글씨',
+  },
+  {
+    id: 'ttukttak',
+    name: '뚝딱감자체',
+    fontFamily: 'TtukttakGamja, sans-serif',
+    category: '귀여움/캐주얼',
+    previewText: '동글동글 귀여운 뚝딱감자',
+  },
+  {
+    id: 'busan-dandi',
+    name: '부산단디고딕',
+    fontFamily: 'BusanDandiGothic, sans-serif',
+    category: '깔끔/모던',
+    previewText: '단정하고 반듯한 단디고딕',
+  },
+  {
+    id: 'school-pencil',
+    name: '학교안심색연필',
+    fontFamily: 'SchoolSafetyColoredPencil, sans-serif',
+    category: '크레용/스케치',
+    previewText: '사각사각 색연필 질감',
+  },
+  {
+    id: 'hippie',
+    name: '히피체',
+    fontFamily: 'Hippie, sans-serif',
+    category: '개성/빈티지',
+    previewText: '자유롭고 힙한 감성의 히피체',
+  },
+];
+
+export const THEME_PRESETS: ThemePreset[] = [
+  {
+    id: 'warm-sketchbook',
+    name: '스케치북 크림 (DESIGN.md)',
+    previewColor: '#FBF9F5',
+    bgGradient: '#FBF9F5',
+    cardBgColor: '#FFFFFF',
+    cardTextColor: '#2C2825',
+    accentColor: '#FF7675',
+    badgeBg: '#FFF0F0',
+    badgeText: '#D63031',
+    borderColor: 'rgba(44, 40, 37, 0.08)',
+  },
+  {
+    id: 'breeze-pastel',
+    name: '파스텔 스카이블루',
+    previewColor: '#E0F2FE',
+    bgGradient: 'linear-gradient(135deg, #e0f2fe 0%, #f0f9ff 50%, #eff6ff 100%)',
+    cardBgColor: '#FFFFFF',
+    cardTextColor: '#1E293B',
+    accentColor: '#0284C7',
+    badgeBg: '#E0F2FE',
+    badgeText: '#0369A1',
+    borderColor: 'rgba(255, 255, 255, 0.85)',
+  },
+  {
+    id: 'kraft-paper',
+    name: '빈티지 크라프트지',
+    previewColor: '#F5ECE7',
+    bgGradient: 'linear-gradient(135deg, #F5ECE7 0%, #EFE6E2 100%)',
+    cardBgColor: '#FFF8F5',
+    cardTextColor: '#2C2825',
+    accentColor: '#A83639',
+    badgeBg: '#FFEAA7',
+    badgeText: '#6C5CE7',
+    borderColor: 'rgba(44, 40, 37, 0.1)',
+  },
+  {
+    id: 'midnight-ink',
+    name: '다크 미드나잇 잉크',
+    previewColor: '#1E1B18',
+    bgGradient: 'linear-gradient(135deg, #1E1B18 0%, #2C2825 50%, #151311 100%)',
+    cardBgColor: '#2C2825',
+    cardTextColor: '#FBF9F5',
+    accentColor: '#FF7675',
+    badgeBg: '#3E3834',
+    badgeText: '#FAB1A0',
+    borderColor: 'rgba(255, 255, 255, 0.12)',
+  },
+];
+
+export const INITIAL_DAYS: DaySchedule[] = [
+  {
+    id: 'mon',
+    day: '월',
+    dayEnglish: 'MON',
+    dateStr: '03.17',
+    isOnline: true,
+    time: '19:00 KST',
+    badge: '종합게임',
+    crayonColor: '#74B9FF', // Sky Pastel
+    title: '신작 RPG 첫 플레이 & 시청자 소통',
+    description: '캐릭터 커스터마이징 투표 함께해요!',
+    footerNote: '종합게임',
+    tagIcon: 'game',
+    tapeAngle: -1.2,
+  },
+  {
+    id: 'tue',
+    day: '화',
+    dayEnglish: 'TUE',
+    dateStr: '03.18',
+    isOnline: true,
+    time: '20:00 KST',
+    badge: '소통/사연',
+    crayonColor: '#FAB1A0', // Warm Peach
+    title: '봄맞이 고민상담 & 익명 사연소',
+    description: '따뜻한 차 한 잔과 달콤라디오☕',
+    footerNote: 'Just Chatting',
+    tagIcon: 'chat',
+    tapeAngle: 0.8,
+  },
+  {
+    id: 'wed',
+    day: '수',
+    dayEnglish: 'WED',
+    dateStr: '03.19',
+    isOnline: false,
+    time: '정기 휴방',
+    badge: 'REST',
+    crayonColor: '#5A544F', // Charcoal
+    title: '정기 휴방 (에너지 충전의 날)',
+    description: '목요일 공포 합방에서 만나요 zZ',
+    footerNote: 'RECHARGE DAY',
+    tagIcon: 'sleep',
+    tapeAngle: -0.5,
+  },
+  {
+    id: 'thu',
+    day: '목',
+    dayEnglish: 'THU',
+    dateStr: '03.20',
+    isOnline: true,
+    time: '19:30 KST',
+    badge: '★ COLLAB',
+    crayonColor: '#A29BFE', // Lavender Dream
+    title: '공포 협동 탈출 3인 대환장 합방',
+    description: 'With 밍키, 초코칩님! 비명 주의',
+    footerNote: '특별 합방',
+    tagIcon: 'sparkle',
+    tapeAngle: 1.4,
+  },
+  {
+    id: 'fri',
+    day: '금',
+    dayEnglish: 'FRI',
+    dateStr: '03.21',
+    isOnline: true,
+    time: '21:00 ON AIR',
+    badge: '힐링 라이브 라디오 & ASMR',
+    crayonColor: '#FF7675', // Crayon Coral (Live Alert)
+    title: '불금 힐링 노래방 & ASMR 속삭이는 밤',
+    description: '신청곡 받고 이야기 나누는 밤샘 심야 방송',
+    footerNote: '심야 라디오 & 라이브',
+    tagIcon: 'audio',
+    isFeatured: true,
+    customBgColor: '#2C2825', // 잉크 블랙 스페셜 벤토 카드
+    customTextColor: '#FBF9F5',
+    tapeAngle: -1.0,
+  },
+  {
+    id: 'sat',
+    day: '토',
+    dayEnglish: 'SAT',
+    dateStr: '03.22',
+    isOnline: true,
+    time: '15:00 KST',
+    badge: '토너먼트',
+    crayonColor: '#FDCB6E', // Mustard Butter (골든아워 주말 액센트)
+    title: '롤 친선 내전 매치 & 치킨 5마리!',
+    description: '시청자 참여 친선전 (티어 무관)',
+    footerNote: '주말 특별 매치',
+    tagIcon: 'game',
+    tapeAngle: 1.1,
+  },
+  {
+    id: 'sun',
+    day: '일',
+    dayEnglish: 'SUN',
+    dateStr: '03.23',
+    isOnline: false,
+    time: '정기 휴방 (OFF)',
+    badge: 'REST',
+    crayonColor: '#FAB1A0',
+    title: '유튜브 클립 편집 & 카페 공지',
+    description: '4주차 스케줄 투표 업로드 예정',
+    footerNote: 'WEEKEND REST',
+    tagIcon: 'sleep',
+    tapeAngle: -0.8,
+  },
+];
+
+export const INITIAL_CONFIG: ScheduleConfig = {
+  headerTitle: 'Weekly Schedule',
+  headerSubtitle: '2025 | 03.17 ~ 03.23',
+  weekNumber: '3월 3주차',
+  noticeText: '목요일 공포 탈출 3인 합방 & 토요일 치킨 5마리 내전 시청자 참여!',
+  channelTags: 'CHZZK / TWITCH / YT',
+  layoutMode: 'bento',
+  textureMode: 'plain',
+  themeId: 'warm-sketchbook',
+  customBgType: 'preset',
+  customBgValue: '#FBF9F5', // DESIGN.md Canvas Desk Base Cream
+  userBgImage: null,
+  bgImageSizeMode: 'cover',
+  cardBgColor: '#FFFFFF', // Sketchbook Sheet
+  cardBgOpacity: 92,
+  cardBlur: 8,
+  cardBorderColor: 'rgba(44, 40, 37, 0.08)',
+  cardTextColor: '#2C2825',
+  cardTitleColor: '#2C2825',
+  selectedFont: 'var(--font-plus-jakarta), Pretendard, sans-serif',
+  fontSizeScale: 100,
+  showWashiTape: true,
+  showCrayonUnderlines: true,
+};

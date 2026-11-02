@@ -1,0 +1,105 @@
+@import "tailwindcss";
+
+/* 사용자 커스텀 한글 폰트 5종 */
+@font-face {
+  font-family: 'OngleipParkDahyeon';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2411-3@1.0/Ownglyph_ParkDaHyun.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'TtukttakGamja';
+  src: url('https://cdn.jsdelivr.net/gh/Project-Noonnu/2610081905@tuktakpotato/tuktakpotato/tuktakpotato.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'BusanDandiGothic';
+  src: url('https://cdn.jsdelivr.net/gh/Project-Noonnu/2610132210@l/l/%EB%B6%80%EC%82%B0%EB%8B%A8%EB%94%94%EA%B3%A0%EB%94%95L.woff2') format('woff2'),
+       url('https://cdn.jsdelivr.net/gh/Project-Noonnu/2610132210@l/l/부산단디고딕L.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'SchoolSafetyColoredPencil';
+  src: url('https://cdn.jsdelivr.net/gh/projectnoonnu/2511-1@1.0/HakgyoansimSaekyeonpilR.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Hippie';
+  src: url('https://cdn.jsdelivr.net/gh/Project-Noonnu/2610081905@hippie/hippie/hippie_%ED%9E%88%ED%94%BC%EC%B2%B4.woff2') format('woff2'),
+       url('https://cdn.jsdelivr.net/gh/Project-Noonnu/2610081905@hippie/hippie/hippie_히피체.woff2') format('woff2');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+:root {
+  --background: #fbf9f5;
+  --foreground: #2c2825;
+  --surface-canvas: #fbf9f5;
+  --surface-card: #f5f2eb;
+  --surface-white: #ffffff;
+  --ink-charcoal: #2c2825;
+  --ink-subtle: #5a544f;
+  --ink-border: #8c847d;
+
+  /* Crayon Swatches */
+  --crayon-coral: #ff7675;
+  --crayon-mustard: #fdcb6e;
+  --crayon-mint: #55efc4;
+  --crayon-sky: #74b9ff;
+  --crayon-lavender: #a29bfe;
+  --crayon-peach: #fab1a0;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-plus-jakarta), -apple-system, BlinkMacSystemFont, "Pretendard", sans-serif;
+  --font-mono: var(--font-space-grotesk), monospace;
+}
+
+body {
+  background: var(--surface-canvas);
+  color: var(--ink-charcoal);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 캔버스 내부 요소들이 선택된 폰트를 상속받고 글씨 크기 배율을 즉각 반영하도록 설정 */
+#schedule-canvas-1080 {
+  --font-scale: 1;
+}
+
+#schedule-canvas-1080,
+#schedule-canvas-1080 *:not([class*="font-mono"]) {
+  font-family: inherit;
+}
+
+/* Washi Tape Texture Effect */
+.washi-tape {
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(4px);
+  box-shadow: 0 1px 3px rgba(44, 40, 37, 0.08);
+  border-left: 2px dashed rgba(44, 40, 37, 0.12);
+  border-right: 2px dashed rgba(44, 40, 37, 0.12);
+}
+
+/* Paper Texture Ambient Shadow */
+.paper-shadow {
+  box-shadow: 0 4px 12px -2px rgba(44, 40, 37, 0.06), 0 1px 3px rgba(44, 40, 37, 0.04);
+}
+
+.paper-card-shadow {
+  box-shadow: 0 2px 6px rgba(44, 40, 37, 0.05);
+}

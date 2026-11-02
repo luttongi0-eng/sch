@@ -1,0 +1,232 @@
+'use client';
+
+import React, { useState, useRef, useEffect } from 'react';
+import { ScheduleConfig, DaySchedule } from '@/types/schedule';
+import { INITIAL_CONFIG, INITIAL_DAYS } from '@/data/constants';
+import { EditorSidebar } from '@/components/EditorSidebar';
+import { SchedulePreview } from '@/components/SchedulePreview';
+import { toPng } from 'html-to-image';
+import confetti from 'canvas-confetti';
+import { 
+  Download, 
+  Grid, 
+  RefreshCw, 
+  Layers
+} from 'lucide-react';
+
+export default function Home() {
+  const [config, setConfig] = useState<ScheduleConfig>(INITIAL_CONFIG);
+  const [days, setDays] = useState<DaySchedule[]>(INITIAL_DAYS);
+  const [zoomMode, setZoomMode] = useState<'fit' | '50' | '75' | '100'>('fit');
+  const [showGridLines, setShowGridLines] = useState<boolean>(false);
+  const [isExporting, setIsExporting] = useState<boolean>(false);
+  const [scale, setScale] = useState<number>(0.55);
+
+  const containerRef = useRef<HTMLDivElement>(null);
+  const previewCanvasRef = useRef<HTMLDivElement>(null);
+
+  // 반응형 Fit 비율 자동 계산 (1920x1080 컨테이너 크기에 맞춤)
+  useEffect(() => {
+    const updateScale = () => {
+      if (!containerRef.current) return;
+      
+      if (zoomMode === '50') {
+        setScale(0.5);
+        return;
+      }
+      if (zoomMode === '75') {
+        setScale(0.75);
+        return;
+      }
+      if (zoomMode === '100') {
+        setScale(1.0);
+        return;
+      }
+
+      // 'fit' 모드일 때
+      const containerWidth = containerRef.current.clientWidth - 48;
+      const containerHeight = containerRef.current.clientHeight - 48;
+
+      const scaleX = containerWidth / 1920;
+      const scaleY = containerHeight / 1080;
+      const fitScale = Math.min(scaleX, scaleY, 0.95);
+
+      setScale(Math.max(fitScale, 0.25));
+    };
+
+    updateScale();
+    window.addEventListener('resize', updateScale);
+    return () => window.removeEventListener('resize', updateScale);
+  }, [zoomMode]);
+
+  // 1920x1080 원본 고해상도 PNG 다운로드 (DESIGN.md: Crisp Export Bar)
+  const handleDownloadPng = async () => {
+    if (!previewCanvasRef.current || isExporting) return;
+
+    try {
+      setIsExporting(true);
+
+      const dataUrl = await toPng(previewCanvasRef.current, {
+        pixelRatio: 1, // 1920x1080 원본 1:1 픽셀 매핑
+        width: 1920,
+        height: 1080,
+        cacheBust: true,
+      });
+
+      const link = document.createElement('a');
+      link.download = `Schedule_${config.headerSubtitle.replace(/[^a-zA-Z0-9가-힣]/g, '_')}_1920x1080.png`;
+      link.href = dataUrl;
+      link.click();
+
+      // 크레용 컬러 테마 축하 콘페티
+      confetti({
+        particleCount: 75,
+        spread: 60,
+        colors: ['#FF7675', '#FDCB6E', '#55EFC4', '#74B9FF', '#A29BFE'],
+        origin: { y: 0.6 },
+      });
+    } catch (err) {
+      console.error('PNG export failed:', err);
+      alert('이미지 내보내기 중 문제가 발생했습니다.');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  return (
+    <div className="flex flex-col h-screen w-screen overflow-hidden bg-[#FBF9F5] text-[#2C2825]">
+      
+      {/* 최상단 네비게이션 글로벌 바 (DESIGN.md Workbench) */}
+      <nav className="h-14 bg-white border-b border-[#E5DFD5] px-6 flex items-center justify-between shrink-0 z-30">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-[#2C2825] flex items-center justify-center text-[#FBF9F5] font-black text-sm shadow-sm">
+            ✦
+          </div>
+          <div>
+            <h1 className="font-extrabold text-sm tracking-tight text-[#2C2825] flex items-center gap-2">
+              Warm Sketchbook Studio <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#FF7675]/15 text-[#FF7675] font-mono font-bold">16:9 HD</span>
+            </h1>
+            <p className="text-[10px] text-[#5A544F]">스트리머 & 크리에이터를 위한 주간 스케줄러 메이커</p>
+          </div>
+        </div>
+
+        {/* 중앙 상단 퀵 날짜 정보 */}
+        <div className="hidden md:flex items-center gap-3 text-xs">
+          <div className="bg-[#F5F2EB] px-4 py-1.5 rounded-full border border-[#E5DFD5] text-[#2C2825] font-mono font-medium">
+            🗓️ {config.headerSubtitle} ({config.weekNumber})
+          </div>
+        </div>
+
+        {/* 우측 주요 내보내기 버튼 (DESIGN.md: High-contrast Charcoal Button) */}
+        <div className="flex items-center gap-3">
+          <button
+            onClick={handleDownloadPng}
+            disabled={isExporting}
+            className="flex items-center gap-2 px-5 py-2 rounded-lg bg-[#2C2825] hover:bg-[#1E1B18] text-[#FBF9F5] font-bold text-xs shadow-md transition-all active:translate-y-0.5 disabled:opacity-50 cursor-pointer"
+          >
+            {isExporting ? (
+              <RefreshCw className="w-4 h-4 animate-spin" />
+            ) : (
+              <Download className="w-4 h-4 text-[#FF7675]" />
+            )}
+            {isExporting ? '고화질 렌더링 중...' : '1920×1080 PNG 내보내기'}
+          </button>
+        </div>
+      </nav>
+
+      {/* 메인 2-패널 작업 영역 */}
+      <div className="flex flex-1 overflow-hidden">
+        
+        {/* 좌측 에디터 사이드바 */}
+        <EditorSidebar
+          config={config}
+          setConfig={setConfig}
+          days={days}
+          setDays={setDays}
+        />
+
+        {/* 우측 16:9 실시간 뷰어 캔버스 */}
+        <div className="flex-1 flex flex-col bg-[#F5F2EB] overflow-hidden relative">
+          
+          {/* 뷰어 제어 툴바 */}
+          <div className="h-12 bg-white/80 backdrop-blur-md border-b border-[#E5DFD5] px-6 flex items-center justify-between shrink-0">
+            <div className="flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-[#55EFC4] ring-2 ring-[#55EFC4]/30 animate-pulse" />
+              <span className="text-xs font-bold text-[#2C2825]">
+                1920 × 1080 Full HD Preview (16:9)
+              </span>
+              <span className="text-[11px] font-mono text-[#8C847D]">
+                | {config.layoutMode === 'bento' ? '비대칭 벤토 스케치북' : '7열 클래식 그리드'}
+              </span>
+            </div>
+
+            {/* 줌 배율 & 가이드라인 토글 */}
+            <div className="flex items-center gap-2">
+              <div className="flex items-center bg-[#F5F2EB] rounded-lg p-0.5 border border-[#E5DFD5] text-xs">
+                {(['50', '75', 'fit', '100'] as const).map((mode) => (
+                  <button
+                    key={mode}
+                    onClick={() => setZoomMode(mode)}
+                    className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all ${
+                      zoomMode === mode
+                        ? 'bg-white text-[#2C2825] font-bold shadow-sm'
+                        : 'text-[#5A544F] hover:text-[#2C2825]'
+                    }`}
+                  >
+                    {mode === 'fit' ? 'Fit (맞춤)' : `${mode}%`}
+                  </button>
+                ))}
+              </div>
+
+              <button
+                onClick={() => setShowGridLines(!showGridLines)}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${
+                  showGridLines
+                    ? 'border-[#FF7675] bg-[#FF7675]/15 text-[#a83639]'
+                    : 'border-[#E5DFD5] bg-white text-[#5A544F] hover:bg-[#F5F2EB]'
+                }`}
+              >
+                <Grid className="w-3.5 h-3.5" /> 가이드 라인
+              </button>
+            </div>
+          </div>
+
+          {/* 16:9 비율 캔버스 뷰포트 (가운데 정렬) */}
+          <div
+            ref={containerRef}
+            className="flex-1 overflow-auto flex items-center justify-center p-6 bg-[#F5F2EB]"
+          >
+            <div
+              style={{
+                width: `${1920 * scale}px`,
+                height: `${1080 * scale}px`,
+                position: 'relative',
+                flexShrink: 0,
+              }}
+              className="transition-all duration-150 paper-shadow rounded-2xl overflow-hidden"
+            >
+              <div
+                style={{
+                  transform: `scale(${scale})`,
+                  transformOrigin: 'top left',
+                  width: '1920px',
+                  height: '1080px',
+                }}
+              >
+                <SchedulePreview
+                  config={config}
+                  days={days}
+                  previewRef={previewCanvasRef}
+                  showGridLines={showGridLines}
+                />
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+  );
+}

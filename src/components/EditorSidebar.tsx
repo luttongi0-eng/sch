@@ -1,0 +1,781 @@
+'use client';
+
+import React, { useState } from 'react';
+import { DaySchedule, ScheduleConfig, LayoutMode, TextureMode } from '@/types/schedule';
+import { THEME_PRESETS, CRAYON_SWATCHES, FONT_OPTIONS } from '@/data/constants';
+import { 
+  Palette, 
+  Layout, 
+  Sliders, 
+  CalendarDays, 
+  ChevronDown, 
+  ChevronUp, 
+  Wifi, 
+  WifiOff, 
+  Type,
+  Stamp,
+  Layers,
+  Sparkles
+} from 'lucide-react';
+
+interface SidebarProps {
+  config: ScheduleConfig;
+  setConfig: React.Dispatch<React.SetStateAction<ScheduleConfig>>;
+  days: DaySchedule[];
+  setDays: React.Dispatch<React.SetStateAction<DaySchedule[]>>;
+}
+
+export const EditorSidebar: React.FC<SidebarProps> = ({
+  config,
+  setConfig,
+  days,
+  setDays,
+}) => {
+  const [activeTab, setActiveTab] = useState<'schedule' | 'style' | 'header'>('schedule');
+  const [expandedDayId, setExpandedDayId] = useState<string | null>('mon');
+
+  const updateDay = (id: string, updates: Partial<DaySchedule>) => {
+    setDays((prev) =>
+      prev.map((d) => (d.id === id ? { ...d, ...updates } : d))
+    );
+  };
+
+  const handleSelectTheme = (themeId: string) => {
+    const selectedTheme = THEME_PRESETS.find((t) => t.id === themeId);
+    if (!selectedTheme) return;
+
+    setConfig((prev) => ({
+      ...prev,
+      themeId: selectedTheme.id,
+      customBgType: 'preset',
+      customBgValue: selectedTheme.bgGradient,
+      cardBgColor: selectedTheme.cardBgColor,
+      cardTextColor: selectedTheme.cardTextColor,
+      cardBorderColor: selectedTheme.borderColor,
+    }));
+  };
+
+  return (
+    <aside className="w-full lg:w-[470px] bg-[#FFFFFF] border-r border-[#E5DFD5] h-full flex flex-col shadow-sm select-none">
+      
+      {/* 1. 상단 바 (DESIGN.md: Clean Workbench with warm charcoal accent) */}
+      <div className="p-4 border-b border-[#E5DFD5] bg-[#FBF9F5]">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-lg bg-[#2C2825] flex items-center justify-center text-[#FBF9F5] font-black text-sm shadow-sm">
+              ✎
+            </div>
+            <div>
+              <h2 className="text-sm font-bold text-[#2C2825] tracking-tight">Warm Sketchbook Studio</h2>
+              <p className="text-[11px] text-[#5A544F]">디자인 에디터 & 스케줄러 메이커</p>
+            </div>
+          </div>
+          <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#FF7675]/15 text-[#FF7675] border border-[#FF7675]/30">
+            {config.layoutMode === 'bento' ? 'BENTO 2.4' : 'LINEAR 7'}
+          </span>
+        </div>
+
+        {/* 탭 버튼들 */}
+        <div className="grid grid-cols-3 gap-1 p-1 bg-[#F5F2EB] rounded-lg text-xs font-semibold text-[#5A544F]">
+          <button
+            onClick={() => setActiveTab('schedule')}
+            className={`py-1.5 rounded-md transition-all flex items-center justify-center gap-1.5 ${
+              activeTab === 'schedule'
+                ? 'bg-white text-[#2C2825] shadow-sm font-bold'
+                : 'hover:text-[#2C2825]'
+            }`}
+          >
+            <CalendarDays className="w-3.5 h-3.5" /> 요일별 일정
+          </button>
+          <button
+            onClick={() => setActiveTab('style')}
+            className={`py-1.5 rounded-md transition-all flex items-center justify-center gap-1.5 ${
+              activeTab === 'style'
+                ? 'bg-white text-[#2C2825] shadow-sm font-bold'
+                : 'hover:text-[#2C2825]'
+            }`}
+          >
+            <Palette className="w-3.5 h-3.5" /> 테마 & 질감
+          </button>
+          <button
+            onClick={() => setActiveTab('header')}
+            className={`py-1.5 rounded-md transition-all flex items-center justify-center gap-1.5 ${
+              activeTab === 'header'
+                ? 'bg-white text-[#2C2825] shadow-sm font-bold'
+                : 'hover:text-[#2C2825]'
+            }`}
+          >
+            <Type className="w-3.5 h-3.5" /> 헤더 & 정보
+          </button>
+        </div>
+      </div>
+
+      {/* 스크롤 가능한 본문 영역 */}
+      <div className="flex-1 overflow-y-auto p-4 space-y-5">
+
+        {/* 탭 1: 요일별 일정 & 온오프라인 상태 */}
+        {activeTab === 'schedule' && (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between pb-1">
+              <span className="text-xs font-bold text-[#2C2825] flex items-center gap-1.5">
+                <CalendarDays className="w-4 h-4 text-[#FF7675]" /> 월~일 요일별 일정 및 크레용 스와치
+              </span>
+              <span className="text-[11px] font-mono text-[#8C847D]">7 DAYS</span>
+            </div>
+
+            <div className="space-y-2.5">
+              {days.map((day) => {
+                const isExpanded = expandedDayId === day.id;
+
+                return (
+                  <div
+                    key={day.id}
+                    className="border border-[#E5DFD5] rounded-xl overflow-hidden bg-[#FBF9F5] transition-all hover:border-[#8C847D]"
+                  >
+                    {/* 아코디언 헤더 */}
+                    <div
+                      onClick={() => setExpandedDayId(isExpanded ? null : day.id)}
+                      className="p-3 bg-white flex items-center justify-between cursor-pointer select-none"
+                    >
+                      <div className="flex items-center gap-2.5">
+                        <span
+                          className="w-7 h-7 rounded-lg text-white font-black text-xs flex items-center justify-center shadow-sm"
+                          style={{ backgroundColor: day.crayonColor }}
+                        >
+                          {day.day}
+                        </span>
+                        <div>
+                          <span className="text-xs font-bold text-[#2C2825] mr-2">
+                            {day.dateStr} ({day.dayEnglish})
+                          </span>
+                          <span className="text-[11px] text-[#5A544F] truncate max-w-[150px] inline-block align-bottom">
+                            {day.title}
+                          </span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-2">
+                        {day.isOnline ? (
+                          <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#55EFC4]/20 text-[#00725a] border border-[#55EFC4]/40">
+                            ON
+                          </span>
+                        ) : (
+                          <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-[#FF7675]/15 text-[#a83639] border border-[#FF7675]/30">
+                            OFF
+                          </span>
+                        )}
+                        {isExpanded ? (
+                          <ChevronUp className="w-4 h-4 text-[#8C847D]" />
+                        ) : (
+                          <ChevronDown className="w-4 h-4 text-[#8C847D]" />
+                        )}
+                      </div>
+                    </div>
+
+                    {/* 아코디언 세부 내용 */}
+                    {isExpanded && (
+                      <div className="p-4 bg-[#FBF9F5] border-t border-[#E5DFD5] space-y-3.5 text-xs">
+                        
+                        {/* 벤토 스페셜 대형 카드 (와이드 2칸) 지정 토글 */}
+                        {config.layoutMode === 'bento' && (
+                          <div className="p-2.5 rounded-xl border border-[#E5DFD5] bg-white flex items-center justify-between">
+                            <div>
+                              <span className="font-bold text-[#2C2825] flex items-center gap-1.5 text-xs">
+                                <Sparkles className="w-3.5 h-3.5 text-[#FF7675]" /> 이 요일을 대형 카드(와이드 2칸)로 강조
+                              </span>
+                              <span className="text-[10px] text-[#8C847D]">
+                                벤토 그리드에서 가장 큰 메인 카드로 표시됩니다.
+                              </span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                // 다른 요일의 isFeatured는 false로 하고 현재 요일만 true로 설정
+                                setDays((prev) =>
+                                  prev.map((d) => ({
+                                    ...d,
+                                    isFeatured: d.id === day.id,
+                                  }))
+                                );
+                              }}
+                              className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                                day.isFeatured
+                                  ? 'bg-[#2C2825] text-white shadow-sm'
+                                  : 'bg-[#F5F2EB] text-[#5A544F] hover:bg-[#E5DFD5]'
+                              }`}
+                            >
+                              {day.isFeatured ? '★ 강조 적용됨' : '선택하기'}
+                            </button>
+                          </div>
+                        )}
+
+                        {/* 방송/일정 상태 전환 (Online / Offline 토글) */}
+                        <div>
+                          <label className="block text-[11px] font-bold text-[#2C2825] mb-1.5">
+                            방송 / 일정 상태 (Online / Offline)
+                          </label>
+                          <div className="grid grid-cols-2 gap-2">
+                            <button
+                              type="button"
+                              onClick={() => updateDay(day.id, { isOnline: true })}
+                              className={`py-2 px-3 rounded-lg flex items-center justify-center gap-1.5 font-bold transition-all ${
+                                day.isOnline
+                                  ? 'bg-[#2C2825] text-[#FBF9F5] shadow-sm'
+                                  : 'bg-white border border-[#E5DFD5] text-[#5A544F] hover:bg-[#F5F2EB]'
+                              }`}
+                            >
+                              <Wifi className="w-3.5 h-3.5 text-[#55EFC4]" /> ONLINE 방송
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => updateDay(day.id, { isOnline: false })}
+                              className={`py-2 px-3 rounded-lg flex items-center justify-center gap-1.5 font-bold transition-all ${
+                                !day.isOnline
+                                  ? 'bg-[#FF7675] text-white shadow-sm'
+                                  : 'bg-white border border-[#E5DFD5] text-[#5A544F] hover:bg-[#F5F2EB]'
+                              }`}
+                            >
+                              <WifiOff className="w-3.5 h-3.5" /> OFFLINE 휴방
+                            </button>
+                          </div>
+                        </div>
+
+                        {/* 크레용 스와치 선택기 (DESIGN.md: Crayon Swatches) */}
+                        <div>
+                          <label className="block text-[11px] font-bold text-[#2C2825] mb-1.5">
+                            크레용 액센트 컬러 스와치
+                          </label>
+                          <div className="flex items-center gap-2 overflow-x-auto pb-1">
+                            {CRAYON_SWATCHES.map((swatch) => (
+                              <button
+                                key={swatch.hex}
+                                type="button"
+                                onClick={() => updateDay(day.id, { crayonColor: swatch.hex })}
+                                className={`w-6 h-6 rounded-full transition-transform shrink-0 ${
+                                  day.crayonColor === swatch.hex
+                                    ? 'ring-2 ring-offset-2 ring-[#2C2825] scale-110'
+                                    : 'hover:scale-105 opacity-80'
+                                }`}
+                                style={{ backgroundColor: swatch.hex }}
+                                title={swatch.name}
+                              />
+                            ))}
+                          </div>
+                        </div>
+
+                        {/* 날짜 & 시간 */}
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <label className="block text-[11px] font-semibold text-[#5A544F] mb-1">
+                              날짜 표기
+                            </label>
+                            <input
+                              type="text"
+                              value={day.dateStr}
+                              onChange={(e) => updateDay(day.id, { dateStr: e.target.value })}
+                              className="w-full px-3 py-1.5 bg-white border border-[#E5DFD5] rounded-md text-[#2C2825] font-mono font-medium focus:border-[#2C2825] outline-none"
+                              placeholder="03.17"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[11px] font-semibold text-[#5A544F] mb-1">
+                              시간 표기
+                            </label>
+                            <input
+                              type="text"
+                              value={day.time}
+                              onChange={(e) => updateDay(day.id, { time: e.target.value })}
+                              className="w-full px-3 py-1.5 bg-white border border-[#E5DFD5] rounded-md text-[#2C2825] font-mono font-medium focus:border-[#2C2825] outline-none"
+                              placeholder="19:00 KST"
+                            />
+                          </div>
+                        </div>
+
+                        {/* 메인 일정 타이틀 */}
+                        <div>
+                          <label className="block text-[11px] font-semibold text-[#5A544F] mb-1">
+                            메인 일정 타이틀
+                          </label>
+                          <input
+                            type="text"
+                            value={day.title}
+                            onChange={(e) => updateDay(day.id, { title: e.target.value })}
+                            className="w-full px-3 py-1.5 bg-white border border-[#E5DFD5] rounded-md text-[#2C2825] font-semibold focus:border-[#2C2825] outline-none"
+                            placeholder="일정 제목"
+                          />
+                        </div>
+
+                        {/* 세부 메모 & 설명 */}
+                        <div>
+                          <label className="block text-[11px] font-semibold text-[#5A544F] mb-1">
+                            세부 내용 및 메모
+                          </label>
+                          <textarea
+                            value={day.description}
+                            onChange={(e) => updateDay(day.id, { description: e.target.value })}
+                            rows={2}
+                            className="w-full px-3 py-1.5 bg-white border border-[#E5DFD5] rounded-md text-[#2C2825] font-medium focus:border-[#2C2825] outline-none resize-none"
+                            placeholder="상세 내용을 적어주세요"
+                          />
+                        </div>
+
+                        {/* 카테고리 뱃지 & 하단 라벨 */}
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <label className="block text-[11px] font-semibold text-[#5A544F] mb-1">
+                              상단 카테고리 뱃지
+                            </label>
+                            <input
+                              type="text"
+                              value={day.badge}
+                              onChange={(e) => updateDay(day.id, { badge: e.target.value })}
+                              className="w-full px-3 py-1.5 bg-white border border-[#E5DFD5] rounded-md text-[#2C2825] font-medium focus:border-[#2C2825] outline-none"
+                              placeholder="종합게임, 저챗 등"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[11px] font-semibold text-[#5A544F] mb-1">
+                              하단 푸터 태그
+                            </label>
+                            <input
+                              type="text"
+                              value={day.footerNote || ''}
+                              onChange={(e) => updateDay(day.id, { footerNote: e.target.value })}
+                              className="w-full px-3 py-1.5 bg-white border border-[#E5DFD5] rounded-md text-[#2C2825] font-medium focus:border-[#2C2825] outline-none"
+                              placeholder="특별 매치 등"
+                            />
+                          </div>
+                        </div>
+
+                        {/* 요일별 박스 개별 투명도 조절 (Opacity) */}
+                        <div className="pt-2 border-t border-[#E5DFD5]">
+                          <div className="flex items-center justify-between mb-1.5">
+                            <label className="text-[11px] font-bold text-[#2C2825] flex items-center gap-1">
+                              <Sliders className="w-3.5 h-3.5 text-[#FF7675]" /> 이 요일 박스만 개별 투명도 조절
+                            </label>
+                            <span className="text-[11px] font-mono font-bold text-[#2C2825]">
+                              {day.customOpacity !== undefined ? `${day.customOpacity}%` : `기본값 (${config.cardBgOpacity}%)`}
+                            </span>
+                          </div>
+                          <input
+                            type="range"
+                            min="0"
+                            max="100"
+                            value={day.customOpacity !== undefined ? day.customOpacity : config.cardBgOpacity}
+                            onChange={(e) => updateDay(day.id, { customOpacity: Number(e.target.value) })}
+                            className="w-full h-1.5 bg-[#E5DFD5] rounded-lg appearance-none cursor-pointer accent-[#2C2825]"
+                          />
+                          {day.customOpacity !== undefined && (
+                            <button
+                              type="button"
+                              onClick={() => updateDay(day.id, { customOpacity: undefined })}
+                              className="mt-1 text-[10px] text-[#5A544F] hover:underline"
+                            >
+                              ↺ 전체 공통 투명도로 되돌리기
+                            </button>
+                          )}
+                        </div>
+
+                        {/* 전용 커스텀 배경색 (선택사항) */}
+                        <div className="pt-2 border-t border-[#E5DFD5]">
+                          <label className="block text-[11px] font-bold text-[#2C2825] mb-1.5">
+                            특정 요일 전용 배경색 (다크 하이라이트용)
+                          </label>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="color"
+                              value={day.customBgColor || '#2C2825'}
+                              onChange={(e) => updateDay(day.id, { customBgColor: e.target.value, customTextColor: '#FFFFFF' })}
+                              className="w-7 h-7 rounded border border-[#E5DFD5] cursor-pointer"
+                            />
+                            <span className="text-[11px] text-[#5A544F] font-mono">
+                              {day.customBgColor || '기본 종이 배경 적용'}
+                            </span>
+                            {day.customBgColor && (
+                              <button
+                                type="button"
+                                onClick={() => updateDay(day.id, { customBgColor: undefined, customTextColor: undefined })}
+                                className="ml-auto text-[11px] text-[#FF7675] hover:underline font-bold"
+                              >
+                                초기화
+                              </button>
+                            )}
+                          </div>
+                        </div>
+
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* 탭 2: 스타일 & 테마 탭 (DESIGN.md Paper Metaphors) */}
+        {activeTab === 'style' && (
+          <div className="space-y-6">
+            
+            {/* 레이아웃 프리셋 */}
+            <div>
+              <label className="block text-xs font-bold text-[#2C2825] mb-2 flex items-center gap-1.5">
+                <Layout className="w-4 h-4 text-[#FF7675]" /> 스케줄 레이아웃 모드
+              </label>
+              <div className="grid grid-cols-2 gap-2.5">
+                <button
+                  type="button"
+                  onClick={() => setConfig((prev) => ({ ...prev, layoutMode: 'bento' }))}
+                  className={`p-3 rounded-xl border text-left transition-all ${
+                    config.layoutMode === 'bento'
+                      ? 'border-[#2C2825] bg-[#F5F2EB] font-bold text-[#2C2825] shadow-sm'
+                      : 'border-[#E5DFD5] bg-white text-[#5A544F] hover:border-[#8C847D]'
+                  }`}
+                >
+                  <div className="text-xs font-bold">스크랩북 2열 벤토</div>
+                  <div className="text-[10px] text-[#8C847D] mt-0.5">상단 4열 + 하단 3열 와이드</div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setConfig((prev) => ({ ...prev, layoutMode: 'linear' }))}
+                  className={`p-3 rounded-xl border text-left transition-all ${
+                    config.layoutMode === 'linear'
+                      ? 'border-[#2C2825] bg-[#F5F2EB] font-bold text-[#2C2825] shadow-sm'
+                      : 'border-[#E5DFD5] bg-white text-[#5A544F] hover:border-[#8C847D]'
+                  }`}
+                >
+                  <div className="text-xs font-bold">단일 7열 직선형</div>
+                  <div className="text-[10px] text-[#8C847D] mt-0.5">클래식 수평 나열</div>
+                </button>
+              </div>
+            </div>
+
+            {/* DESIGN.md: 테마 프리셋 */}
+            <div>
+              <label className="block text-xs font-bold text-[#2C2825] mb-2 flex items-center gap-1.5">
+                <Palette className="w-4 h-4 text-[#FF7675]" /> 스케치북 테마 프리셋
+              </label>
+              <div className="grid grid-cols-2 gap-2">
+                {THEME_PRESETS.map((theme) => (
+                  <button
+                    key={theme.id}
+                    onClick={() => {
+                      handleSelectTheme(theme.id);
+                      // 프리셋 선택 시 사용자 커스텀 이미지 해제
+                      setConfig((prev) => ({ ...prev, userBgImage: null }));
+                    }}
+                    className={`p-2.5 rounded-xl border flex items-center gap-2.5 transition-all text-left ${
+                      config.themeId === theme.id && !config.userBgImage
+                        ? 'border-[#2C2825] bg-[#F5F2EB] font-bold text-[#2C2825] shadow-sm'
+                        : 'border-[#E5DFD5] hover:border-[#8C847D] text-[#5A544F]'
+                    }`}
+                  >
+                    <div
+                      className="w-5 h-5 rounded-full border border-black/10 shrink-0"
+                      style={{ background: theme.previewColor }}
+                    />
+                    <span className="text-[11px] truncate">{theme.name}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 사용자 커스텀 배경 이미지 업로드 및 맞춤/확대 옵션 */}
+            <div className="p-4 bg-[#FFFFFF] border border-[#E5DFD5] rounded-xl space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-[#2C2825] flex items-center gap-1.5">
+                  <span className="text-[#FF7675]">🖼️</span> 나만의 배경 이미지 업로드
+                </label>
+                {config.userBgImage && (
+                  <button
+                    type="button"
+                    onClick={() => setConfig((prev) => ({ ...prev, userBgImage: null }))}
+                    className="text-[11px] text-[#FF7675] hover:underline font-bold"
+                  >
+                    이미지 제거
+                  </button>
+                )}
+              </div>
+
+              {/* 파일 업로드 인풋 */}
+              <label className="flex flex-col items-center justify-center border-2 border-dashed border-[#E5DFD5] hover:border-[#2C2825] rounded-xl p-4 cursor-pointer transition-colors bg-[#FBF9F5]">
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    const file = e.target.files?.[0];
+                    if (file) {
+                      const reader = new FileReader();
+                      reader.onload = (event) => {
+                        const result = event.target?.result as string;
+                        if (result) {
+                          setConfig((prev) => ({
+                            ...prev,
+                            userBgImage: result,
+                          }));
+                        }
+                      };
+                      reader.readAsDataURL(file);
+                    }
+                  }}
+                />
+                <span className="text-xs font-bold text-[#2C2825] mb-0.5">
+                  {config.userBgImage ? '✓ 새 이미지로 변경하기' : '+ 이미지 파일 선택 (JPG, PNG)'}
+                </span>
+                <span className="text-[10px] text-[#8C847D]">
+                  16:9 비율(1920×1080) 권장 / 모든 비율 이미지 지원
+                </span>
+              </label>
+
+              {/* 이미지 크기/맞춤 방식 선택 (16:9가 아닐 경우 또는 맞춤 방식) */}
+              {config.userBgImage && (
+                <div className="pt-2 border-t border-[#E5DFD5] space-y-2">
+                  <span className="block text-[11px] font-bold text-[#2C2825]">
+                    배경 크기 맞춤 방식
+                  </span>
+                  <div className="grid grid-cols-3 gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => setConfig((prev) => ({ ...prev, bgImageSizeMode: 'cover' }))}
+                      className={`py-1.5 px-2 rounded-lg border text-[11px] font-bold transition-all ${
+                        config.bgImageSizeMode === 'cover'
+                          ? 'border-[#2C2825] bg-[#2C2825] text-white shadow-sm'
+                          : 'border-[#E5DFD5] bg-white text-[#5A544F] hover:bg-[#F5F2EB]'
+                      }`}
+                    >
+                      확대 (꽉 채움)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setConfig((prev) => ({ ...prev, bgImageSizeMode: 'contain' }))}
+                      className={`py-1.5 px-2 rounded-lg border text-[11px] font-bold transition-all ${
+                        config.bgImageSizeMode === 'contain'
+                          ? 'border-[#2C2825] bg-[#2C2825] text-white shadow-sm'
+                          : 'border-[#E5DFD5] bg-white text-[#5A544F] hover:bg-[#F5F2EB]'
+                      }`}
+                    >
+                      맞춤 (비율 유지)
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setConfig((prev) => ({ ...prev, bgImageSizeMode: 'fill' }))}
+                      className={`py-1.5 px-2 rounded-lg border text-[11px] font-bold transition-all ${
+                        config.bgImageSizeMode === 'fill'
+                          ? 'border-[#2C2825] bg-[#2C2825] text-white shadow-sm'
+                          : 'border-[#E5DFD5] bg-white text-[#5A544F] hover:bg-[#F5F2EB]'
+                      }`}
+                    >
+                      16:9 전체 맞춤
+                    </button>
+                  </div>
+                  <p className="text-[10px] text-[#8C847D]">
+                    {config.bgImageSizeMode === 'cover' && '• 여백 없이 16:9 전체 영역을 꽉 채웁니다.'}
+                    {config.bgImageSizeMode === 'contain' && '• 원본 사진의 비율을 유지하며 화면 안에 온전히 맞춥니다.'}
+                    {config.bgImageSizeMode === 'fill' && '• 16:9 비율(1920×1080)에 화면을 1:1로 맞춥니다.'}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* DESIGN.md 질감 텍스처 (Grid / Grain / Plain) */}
+            <div>
+              <label className="block text-xs font-bold text-[#2C2825] mb-2 flex items-center gap-1.5">
+                <Layers className="w-4 h-4 text-[#FF7675]" /> 캔버스 종이 질감
+              </label>
+              <div className="grid grid-cols-3 gap-2">
+                {(['plain', 'grid', 'grain'] as const).map((mode) => (
+                  <button
+                    key={mode}
+                    type="button"
+                    onClick={() => setConfig((prev) => ({ ...prev, textureMode: mode }))}
+                    className={`py-2 px-3 rounded-lg border text-xs font-bold capitalize transition-all ${
+                      config.textureMode === mode
+                        ? 'border-[#2C2825] bg-[#2C2825] text-white shadow-sm'
+                        : 'border-[#E5DFD5] bg-white text-[#5A544F] hover:bg-[#F5F2EB]'
+                    }`}
+                  >
+                    {mode === 'plain' ? '일반 스무스' : mode === 'grid' ? '모눈 종이' : '미세 그레인'}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 핵심 기능: 요일별 박스 투명도 조절 (Opacity) 슬라이더 */}
+            <div className="p-4 bg-[#F5F2EB] rounded-xl border border-[#E5DFD5] space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-[#2C2825] flex items-center gap-1.5">
+                  <Sliders className="w-4 h-4 text-[#FF7675]" /> 박스 배경 투명도 (Opacity)
+                </label>
+                <span className="text-xs font-mono font-bold text-[#2C2825]">
+                  {config.cardBgOpacity}%
+                </span>
+              </div>
+              <input
+                type="range"
+                min="10"
+                max="100"
+                value={config.cardBgOpacity}
+                onChange={(e) =>
+                  setConfig((prev) => ({ ...prev, cardBgOpacity: Number(e.target.value) }))
+                }
+                className="w-full h-2 bg-[#E5DFD5] rounded-lg appearance-none cursor-pointer accent-[#2C2825]"
+              />
+              <p className="text-[11px] text-[#5A544F] leading-relaxed">
+                ✨ <strong>텍스트와 일정 내용은 100% 선명하게 유지</strong>되며 박스의 배경색만 투명도를 조절합니다.
+              </p>
+            </div>
+
+            {/* 전체 스케줄러 폰트/글씨체 선택 */}
+            <div className="p-4 bg-white border border-[#E5DFD5] rounded-xl space-y-3">
+              <div className="flex items-center justify-between">
+                <label className="text-xs font-bold text-[#2C2825] flex items-center gap-1.5">
+                  <Type className="w-4 h-4 text-[#FF7675]" /> 스케줄러 글씨체 (폰트)
+                </label>
+                <span className="text-[10px] text-[#8C847D] font-mono">5종 인기 한글 폰트</span>
+              </div>
+              <div className="grid grid-cols-1 gap-2">
+                {FONT_OPTIONS.map((font) => (
+                  <button
+                    key={font.id}
+                    type="button"
+                    onClick={() => setConfig((prev) => ({ ...prev, selectedFont: font.fontFamily }))}
+                    className={`p-2.5 rounded-lg border text-left transition-all ${
+                      config.selectedFont === font.fontFamily
+                        ? 'border-[#2C2825] bg-[#F5F2EB] shadow-sm'
+                        : 'border-[#E5DFD5] bg-[#FBF9F5] hover:border-[#8C847D]'
+                    }`}
+                  >
+                    <div className="flex items-center justify-between mb-1">
+                      <span className="text-xs font-bold text-[#2C2825]">{font.name}</span>
+                      <span className="text-[10px] px-1.5 py-0.2 rounded bg-white text-[#5A544F] border border-[#E5DFD5]">
+                        {font.category}
+                      </span>
+                    </div>
+                    <div
+                      className="text-sm text-[#2C2825] truncate"
+                      style={{ fontFamily: font.fontFamily }}
+                    >
+                      {font.previewText} (19:00 KST 라이브 방송)
+                    </div>
+                  </button>
+                ))}
+              </div>
+
+              {/* 글씨체 크기 조절 슬라이더 */}
+              <div className="pt-3 border-t border-[#E5DFD5] space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-[11px] font-bold text-[#2C2825]">
+                    전체 글씨체 크기 비율 (Font Size)
+                  </span>
+                  <div className="flex items-center gap-1.5">
+                    <span className="text-[11px] font-mono font-bold text-[#2C2825]">
+                      {config.fontSizeScale || 100}%
+                    </span>
+                    {(config.fontSizeScale && config.fontSizeScale !== 100) && (
+                      <button
+                        type="button"
+                        onClick={() => setConfig((prev) => ({ ...prev, fontSizeScale: 100 }))}
+                        className="text-[10px] text-[#FF7675] hover:underline font-bold"
+                      >
+                        (100% 초기화)
+                      </button>
+                    )}
+                  </div>
+                </div>
+                <input
+                  type="range"
+                  min="75"
+                  max="135"
+                  step="5"
+                  value={config.fontSizeScale || 100}
+                  onChange={(e) =>
+                    setConfig((prev) => ({ ...prev, fontSizeScale: Number(e.target.value) }))
+                  }
+                  className="w-full h-1.5 bg-[#E5DFD5] rounded-lg appearance-none cursor-pointer accent-[#2C2825]"
+                />
+                <div className="flex justify-between text-[10px] text-[#8C847D] font-mono">
+                  <span>작게 (75%)</span>
+                  <span>보통 (100%)</span>
+                  <span>크게 (135%)</span>
+                </div>
+              </div>
+            </div>
+
+            {/* 마스킹 테이프 & 장식 토글 */}
+            <div className="p-3 bg-white border border-[#E5DFD5] rounded-xl flex items-center justify-between">
+              <div>
+                <span className="text-xs font-bold text-[#2C2825] block">마스킹 테이프 핀 장식</span>
+                <span className="text-[10px] text-[#8C847D]">카드 상단 Washi Tape 연출</span>
+              </div>
+              <input
+                type="checkbox"
+                checked={config.showWashiTape}
+                onChange={(e) => setConfig((prev) => ({ ...prev, showWashiTape: e.target.checked }))}
+                className="w-4 h-4 accent-[#2C2825] cursor-pointer"
+              />
+            </div>
+
+          </div>
+        )}
+
+        {/* 탭 3: 헤더 & 정보 탭 */}
+        {activeTab === 'header' && (
+          <div className="space-y-4 text-xs">
+            <div>
+              <label className="block font-bold text-[#2C2825] mb-1">스케줄러 메인 타이틀</label>
+              <input
+                type="text"
+                value={config.headerTitle}
+                onChange={(e) => setConfig((prev) => ({ ...prev, headerTitle: e.target.value }))}
+                className="w-full px-3 py-2 bg-white border border-[#E5DFD5] rounded-lg text-[#2C2825] font-semibold focus:border-[#2C2825] outline-none"
+              />
+            </div>
+
+            <div className="grid grid-cols-2 gap-2">
+              <div>
+                <label className="block font-semibold text-[#5A544F] mb-1">날짜 기간</label>
+                <input
+                  type="text"
+                  value={config.headerSubtitle}
+                  onChange={(e) => setConfig((prev) => ({ ...prev, headerSubtitle: e.target.value }))}
+                  className="w-full px-3 py-1.5 bg-white border border-[#E5DFD5] rounded-md text-[#2C2825] font-mono font-medium focus:border-[#2C2825] outline-none"
+                />
+              </div>
+              <div>
+                <label className="block font-semibold text-[#5A544F] mb-1">주차 뱃지</label>
+                <input
+                  type="text"
+                  value={config.weekNumber}
+                  onChange={(e) => setConfig((prev) => ({ ...prev, weekNumber: e.target.value }))}
+                  className="w-full px-3 py-1.5 bg-white border border-[#E5DFD5] rounded-md text-[#2C2825] font-medium focus:border-[#2C2825] outline-none"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block font-bold text-[#2C2825] mb-1">공지사항 티커 (Notice)</label>
+              <textarea
+                value={config.noticeText}
+                onChange={(e) => setConfig((prev) => ({ ...prev, noticeText: e.target.value }))}
+                rows={2}
+                className="w-full px-3 py-2 bg-white border border-[#E5DFD5] rounded-lg text-[#2C2825] font-medium focus:border-[#2C2825] outline-none resize-none"
+              />
+            </div>
+
+            <div>
+              <label className="block font-bold text-[#2C2825] mb-1">채널/플랫폼 태그</label>
+              <input
+                type="text"
+                value={config.channelTags}
+                onChange={(e) => setConfig((prev) => ({ ...prev, channelTags: e.target.value }))}
+                className="w-full px-3 py-2 bg-white border border-[#E5DFD5] rounded-lg text-[#2C2825] font-mono font-medium focus:border-[#2C2825] outline-none"
+              />
+            </div>
+          </div>
+        )}
+
+      </div>
+    </aside>
+  );
+};
