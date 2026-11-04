@@ -116,21 +116,26 @@ export default function Home() {
         return;
       }
 
-      // 'fit' 모드일 때
-      const containerWidth = containerRef.current.clientWidth - 48;
-      const containerHeight = containerRef.current.clientHeight - 48;
+      // 'fit' 모드일 때: 모바일 기기 패딩을 고려하여 여백 계산
+      const isMobile = window.innerWidth < 768;
+      const paddingH = isMobile ? 16 : 48;
+      const paddingV = isMobile ? 16 : 48;
+
+      const containerWidth = Math.max(containerRef.current.clientWidth - paddingH, 100);
+      const containerHeight = Math.max(containerRef.current.clientHeight - paddingV, 100);
 
       const scaleX = containerWidth / 1920;
       const scaleY = containerHeight / 1080;
       const fitScale = Math.min(scaleX, scaleY, 0.95);
 
-      setScale(Math.max(fitScale, 0.25));
+      // 모바일(360px~430px)에서도 온전히 들어갈 수 있도록 최소 스케일 하한 제거 (최소 0.1)
+      setScale(Math.max(fitScale, 0.1));
     };
 
     updateScale();
     window.addEventListener('resize', updateScale);
     return () => window.removeEventListener('resize', updateScale);
-  }, [zoomMode]);
+  }, [zoomMode, mobileViewTab]);
 
   // 1920x1080 원본 고해상도 PNG 다운로드 (DESIGN.md: Crisp Export Bar)
   const handleDownloadPng = async () => {
@@ -309,7 +314,7 @@ export default function Home() {
           {/* 16:9 비율 캔버스 뷰포트 (가운데 정렬) */}
           <div
             ref={containerRef}
-            className="flex-1 overflow-auto flex items-center justify-center p-6 bg-[#F5F2EB]"
+            className="flex-1 overflow-auto flex items-center justify-center p-2 md:p-6 bg-[#F5F2EB]"
           >
             <div
               style={{
@@ -318,7 +323,7 @@ export default function Home() {
                 position: 'relative',
                 flexShrink: 0,
               }}
-              className="transition-all duration-150 paper-shadow rounded-2xl overflow-hidden"
+              className="transition-all duration-150 paper-shadow rounded-xl md:rounded-2xl overflow-hidden mx-auto"
             >
               <div
                 style={{
