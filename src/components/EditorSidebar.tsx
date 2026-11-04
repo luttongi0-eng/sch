@@ -138,6 +138,29 @@ export const EditorSidebar: React.FC<SidebarProps> = ({
               >
                 <CalendarCheck className="w-3.5 h-3.5" /> 이번 주 날짜로 맞추기
               </button>
+              <button
+                type="button"
+                onClick={() => {
+                  if (window.confirm('모든 요일을 OFFLINE(휴방) 상태로 일괄 변경하시겠습니까?')) {
+                    setDays((prev) =>
+                      prev.map((d) => ({
+                        ...d,
+                        isOnline: false,
+                        time: '휴방',
+                        title: 'OFFLINE',
+                        description: '',
+                        badge: 'REST',
+                        footerNote: 'RECHARGE DAY',
+                        tagIcon: 'sleep',
+                      }))
+                    );
+                  }
+                }}
+                className="flex items-center gap-1 text-[11px] font-bold text-[#5A544F] hover:text-[#2C2825] bg-[#F5F2EB] hover:bg-[#E5DFD5] px-2 py-1 rounded-md transition-all cursor-pointer"
+                title="전체 요일을 OFFLINE 휴방 양식으로 일괄 전환"
+              >
+                전체 휴방
+              </button>
             </div>
 
             <div className="space-y-2.5">
