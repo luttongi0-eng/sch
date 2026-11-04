@@ -129,6 +129,9 @@ export const INITIAL_DAYS: DaySchedule[] = [
     footerNote: 'RECHARGE DAY',
     tagIcon: 'sleep',
     tapeAngle: -1.2,
+    diyX: 1100,
+    diyY: 180,
+    diyWidth: 460,
   },
   {
     id: 'tue',
@@ -144,6 +147,9 @@ export const INITIAL_DAYS: DaySchedule[] = [
     footerNote: 'RECHARGE DAY',
     tagIcon: 'sleep',
     tapeAngle: 0.8,
+    diyX: 1100,
+    diyY: 290,
+    diyWidth: 460,
   },
   {
     id: 'wed',
@@ -159,6 +165,9 @@ export const INITIAL_DAYS: DaySchedule[] = [
     footerNote: 'RECHARGE DAY',
     tagIcon: 'sleep',
     tapeAngle: -0.5,
+    diyX: 1100,
+    diyY: 400,
+    diyWidth: 460,
   },
   {
     id: 'thu',
@@ -174,6 +183,9 @@ export const INITIAL_DAYS: DaySchedule[] = [
     footerNote: 'RECHARGE DAY',
     tagIcon: 'sleep',
     tapeAngle: 1.4,
+    diyX: 1100,
+    diyY: 510,
+    diyWidth: 460,
   },
   {
     id: 'fri',
@@ -190,6 +202,9 @@ export const INITIAL_DAYS: DaySchedule[] = [
     tagIcon: 'sleep',
     isFeatured: true,
     tapeAngle: -1.0,
+    diyX: 1100,
+    diyY: 620,
+    diyWidth: 460,
   },
   {
     id: 'sat',
@@ -205,6 +220,9 @@ export const INITIAL_DAYS: DaySchedule[] = [
     footerNote: 'RECHARGE DAY',
     tagIcon: 'sleep',
     tapeAngle: 1.1,
+    diyX: 1100,
+    diyY: 730,
+    diyWidth: 460,
   },
   {
     id: 'sun',
@@ -220,6 +238,9 @@ export const INITIAL_DAYS: DaySchedule[] = [
     footerNote: 'RECHARGE DAY',
     tagIcon: 'sleep',
     tapeAngle: -0.8,
+    diyX: 1100,
+    diyY: 840,
+    diyWidth: 460,
   },
 ];
 
@@ -249,4 +270,6 @@ export const INITIAL_CONFIG: ScheduleConfig = {
   artByText: '그려주신분 이름',
   notebookAlign: 'right',
   polaroidPhoto: null,
+  diyShowCardBg: true,
+  diyGlobalWidth: 420,
 };

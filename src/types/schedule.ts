@@ -16,9 +16,15 @@ export interface DaySchedule {
   customOpacity?: number; // 특정 요일 박스 구역 전용 투명도 (선택사항, 0~100)
   tapeAngle?: number; // 마스킹 테이프 회전 각도 (-1.5 ~ 1.5 deg)
   isFeatured?: boolean; // 벤토 레이아웃에서 2칸 와이드로 크게 강조할 요일 여부
+  
+  // DIY 커스텀 자유 배치 모드 전용 좌표 및 크기 (px 단위, 1920x1080 기준)
+  diyX?: number; // X 좌표 (0 ~ 1920)
+  diyY?: number; // Y 좌표 (0 ~ 1080)
+  diyWidth?: number; // 박스 너비 (기본값 약 380px)
+  diyHeight?: number; // 박스 높이
 }
 
-export type LayoutMode = 'bento' | 'linear' | 'notebook' | 'polaroid';
+export type LayoutMode = 'bento' | 'linear' | 'notebook' | 'polaroid' | 'custom_diy';
 export type TextureMode = 'grain' | 'grid' | 'plain';
 export type ImageSizeMode = 'cover' | 'contain' | 'fill'; // 확대(꽉 채움) / 맞춤(비율유지) / 늘리기
 
@@ -70,4 +76,8 @@ export interface ScheduleConfig {
   artByText?: string; // "그려주신분 이름"
   notebookAlign?: 'left' | 'right'; // 스케줄 표 위치 (우측 또는 좌측)
   polaroidPhoto?: string | null; // 폴라로이드 프레임 내에 넣을 사진/일러스트 (선택)
+  
+  // DIY 커스텀 모드 설정
+  diyShowCardBg?: boolean; // DIY 요일 박스에 반투명 배경 카드를 씌울지, 텍스트만 깔끔하게 올릴지 여부
+  diyGlobalWidth?: number; // DIY 요일 박스 공통 너비
 }

@@ -532,7 +532,69 @@ export const EditorSidebar: React.FC<SidebarProps> = ({
                   <div className="text-xs font-bold">밤하늘 폴라로이드</div>
                   <div className="text-[10px] text-[#8C847D] mt-0.5">액자 프레임 & 캡슐 바</div>
                 </button>
+
+                <button
+                  type="button"
+                  onClick={() => setConfig((prev) => ({ ...prev, layoutMode: 'custom_diy' }))}
+                  className={`p-2.5 rounded-xl border text-left transition-all col-span-2 ${
+                    config.layoutMode === 'custom_diy'
+                      ? 'border-[#FF7675] bg-[#FF7675]/10 font-bold text-[#a83639] shadow-sm ring-2 ring-[#FF7675]/20'
+                      : 'border-[#E5DFD5] bg-white text-[#5A544F] hover:border-[#FF7675]/50'
+                  }`}
+                >
+                  <div className="text-xs font-bold flex items-center justify-between">
+                    <span>✨ 자유 틀 템플릿 (DIY 드래그 배치)</span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#FF7675] text-white font-mono">NEW</span>
+                  </div>
+                  <div className="text-[10px] text-[#8C847D] mt-0.5">
+                    원하는 틀 사진을 올리고, 마우스로 각 요일 글자 위치를 자유롭게 끌어서 맞춤
+                  </div>
+                </button>
               </div>
+
+              {/* DIY 모드 전용 옵션 */}
+              {config.layoutMode === 'custom_diy' && (
+                <div className="mt-3 p-3.5 bg-[#FFF0F0] border-2 border-[#FF7675]/30 rounded-xl space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-xs font-bold text-[#2C2825] flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-[#FF7675]" /> DIY 자유 배치 모드 안내
+                    </span>
+                    <span className="text-[10px] text-[#FF7675] font-bold">드래그 지원</span>
+                  </div>
+                  <p className="text-[11px] text-[#5A544F] leading-relaxed">
+                    💡 <strong>사용법:</strong> 우측 캔버스에서 각 요일 일정을 <strong>마우스나 터치로 끌어서(드래그)</strong> 원하는 틀의 빈칸 위치에 맞추세요.
+                  </p>
+
+                  <div className="pt-2 border-t border-[#FF7675]/20 flex items-center justify-between">
+                    <div>
+                      <span className="text-[11px] font-bold text-[#2C2825] block">반투명 카드 박스 표시</span>
+                      <span className="text-[9px] text-[#8C847D]">끄면 글자만 깔끔하게 틀 위에 얹어집니다</span>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={config.diyShowCardBg !== false}
+                      onChange={(e) => setConfig((prev) => ({ ...prev, diyShowCardBg: e.target.checked }))}
+                      className="w-4 h-4 accent-[#2C2825] cursor-pointer"
+                    />
+                  </div>
+
+                  <div className="pt-2 border-t border-[#FF7675]/20">
+                    <div className="flex justify-between items-center mb-1">
+                      <label className="text-[11px] font-bold text-[#2C2825]">요일 박스 너비 조절</label>
+                      <span className="text-[11px] font-mono text-[#5A544F]">{config.diyGlobalWidth || 460}px</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="280"
+                      max="700"
+                      step="10"
+                      value={config.diyGlobalWidth || 460}
+                      onChange={(e) => setConfig((prev) => ({ ...prev, diyGlobalWidth: Number(e.target.value) }))}
+                      className="w-full h-1.5 bg-[#E5DFD5] rounded-lg appearance-none cursor-pointer accent-[#FF7675]"
+                    />
+                  </div>
+                </div>
+              )}
 
               {/* 폴라로이드 모드 전용 사진 업로드 & 작가명 옵션 */}
               {config.layoutMode === 'polaroid' && (

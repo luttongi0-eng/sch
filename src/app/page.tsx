@@ -338,6 +338,12 @@ export default function Home() {
                   days={days}
                   previewRef={previewCanvasRef}
                   showGridLines={showGridLines}
+                  viewportScale={scale}
+                  onUpdateDayCoords={(dayId, x, y) => {
+                    setDays((prev) =>
+                      prev.map((d) => (d.id === dayId ? { ...d, diyX: x, diyY: y } : d))
+                    );
+                  }}
                 />
               </div>
             </div>

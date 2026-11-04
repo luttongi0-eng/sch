@@ -21,6 +21,8 @@ interface PreviewProps {
   days: DaySchedule[];
   previewRef?: React.RefObject<HTMLDivElement | null>;
   showGridLines?: boolean;
+  onUpdateDayCoords?: (dayId: string, x: number, y: number) => void;
+  viewportScale?: number;
 }
 
 export const SchedulePreview: React.FC<PreviewProps> = ({
@@ -28,6 +30,8 @@ export const SchedulePreview: React.FC<PreviewProps> = ({
   days,
   previewRef,
   showGridLines = false,
+  onUpdateDayCoords,
+  viewportScale = 1,
 }) => {
   const getIcon = (iconName?: string) => {
     switch (iconName) {
@@ -671,6 +675,117 @@ export const SchedulePreview: React.FC<PreviewProps> = ({
 
             </div>
 
+          </main>
+        ) : config.layoutMode === 'custom_diy' ? (
+          /* ========================================================
+             커스텀 템플릿 DIY 자유 배치 모드 (Free Drag & Drop Layout)
+             ======================================================== */
+          <main className="absolute inset-0 pointer-events-auto">
+            {days.map((day) => {
+              const x = day.diyX ?? 1000;
+              const y = day.diyY ?? 200;
+              const boxWidth = day.diyWidth || config.diyGlobalWidth || 460;
+              const isSpecialDark = !!day.customBgColor;
+
+              return (
+                <div
+                  key={day.id}
+                  style={{
+                    position: 'absolute',
+                    left: `${x}px`,
+                    top: `${y}px`,
+                    width: `${boxWidth}px`,
+                    cursor: onUpdateDayCoords ? 'grab' : 'default',
+                    touchAction: 'none',
+                  }}
+                  onPointerDown={(e) => {
+                    if (!onUpdateDayCoords) return;
+                    e.preventDefault();
+                    const startX = e.clientX;
+                    const startY = e.clientY;
+                    const initialX = x;
+                    const initialY = y;
+                    const currentScale = viewportScale || 1;
+
+                    const handlePointerMove = (moveEvent: PointerEvent) => {
+                      const deltaX = (moveEvent.clientX - startX) / currentScale;
+                      const deltaY = (moveEvent.clientY - startY) / currentScale;
+                      const newX = Math.round(Math.max(0, Math.min(1920 - boxWidth, initialX + deltaX)));
+                      const newY = Math.round(Math.max(0, Math.min(1080 - 60, initialY + deltaY)));
+                      onUpdateDayCoords(day.id, newX, newY);
+                    };
+
+                    const handlePointerUp = () => {
+                      window.removeEventListener('pointermove', handlePointerMove);
+                      window.removeEventListener('pointerup', handlePointerUp);
+                    };
+
+                    window.addEventListener('pointermove', handlePointerMove);
+                    window.addEventListener('pointerup', handlePointerUp);
+                  }}
+                  className={`group select-none transition-shadow rounded-2xl p-3.5 border ${
+                    config.diyShowCardBg !== false
+                      ? 'bg-white/90 backdrop-blur-md border-[#2C2825]/15 shadow-[0_6px_20px_rgba(44,40,37,0.1)]'
+                      : 'bg-transparent border-transparent hover:border-dashed hover:border-[#FF7675]/60 hover:bg-white/20'
+                  }`}
+                >
+                  {/* 드래그 가능 핸들 가이드 (호버 시 표시) */}
+                  <div className="flex items-center justify-between gap-3">
+                    {/* 요일 원형 뱃지 */}
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span
+                        className="w-8 h-8 rounded-xl font-black text-xs flex items-center justify-center text-white shadow-sm"
+                        style={{ backgroundColor: day.crayonColor }}
+                      >
+                        {day.day}
+                      </span>
+                      <span
+                        className={`font-mono font-bold text-xs ${
+                          config.diyShowCardBg !== false ? 'text-[#5A544F]' : 'text-current'
+                        }`}
+                      >
+                        {day.dayEnglish} {day.dateStr}
+                      </span>
+                    </div>
+
+                    {/* 세로 구분선 */}
+                    <div className="w-[1.5px] h-5 bg-[#2C2825]/20 shrink-0" />
+
+                    {/* 메인 일정 타이틀 */}
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <span
+                          className={`font-black truncate ${
+                            day.isOnline ? (isSpecialDark ? 'text-white' : 'text-[#2C2825]') : 'text-[#8C847D]'
+                          }`}
+                          style={fs(16)}
+                        >
+                          {day.title}
+                        </span>
+                        {!day.isOnline && (
+                          <span className="text-[10px] font-bold px-1.5 py-0.2 rounded bg-[#FF7675]/15 text-[#a83639] shrink-0">
+                            휴방
+                          </span>
+                        )}
+                      </div>
+                      {day.description && day.isOnline && (
+                        <p
+                          className="text-[#5A544F] font-medium truncate mt-0.5"
+                          style={fs(12)}
+                        >
+                          {day.description}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* 방송 시간 */}
+                    <div className="shrink-0 font-mono font-black text-xs tracking-tight text-right w-20">
+                      {day.time}
+                    </div>
+                  </div>
+                </div>
+              );
+            })}
           </main>
         ) : (
           /* ========================================================
