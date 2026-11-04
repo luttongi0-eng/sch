@@ -73,7 +73,7 @@ export const EditorSidebar: React.FC<SidebarProps> = ({
         <div className="flex items-center justify-between mb-3">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-lg bg-[#2C2825] flex items-center justify-center text-[#FBF9F5] font-black text-sm shadow-sm">
-              ✎
+              S
             </div>
             <div>
               <h2 className="text-sm font-bold text-[#2C2825] tracking-tight">Warm Sketchbook Studio</h2>
@@ -561,7 +561,7 @@ export const EditorSidebar: React.FC<SidebarProps> = ({
                   }`}
                 >
                   <div className="text-xs font-bold flex items-center justify-between">
-                    <span>✨ 자유 틀 템플릿 (DIY 드래그 배치)</span>
+                    <span>자유 틀 템플릿 (DIY 드래그 배치)</span>
                     <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#FF7675] text-white font-mono">NEW</span>
                   </div>
                   <div className="text-[10px] text-[#8C847D] mt-0.5">
@@ -575,12 +575,12 @@ export const EditorSidebar: React.FC<SidebarProps> = ({
                 <div className="mt-3 p-3.5 bg-[#FFF0F0] border-2 border-[#FF7675]/30 rounded-xl space-y-3">
                   <div className="flex items-center justify-between">
                     <span className="text-xs font-bold text-[#2C2825] flex items-center gap-1.5">
-                      <Sparkles className="w-3.5 h-3.5 text-[#FF7675]" /> DIY 자유 배치 모드 안내
+                      <Layout className="w-3.5 h-3.5 text-[#FF7675]" /> DIY 자유 배치 모드 설정
                     </span>
                     <span className="text-[10px] text-[#FF7675] font-bold">드래그 지원</span>
                   </div>
                   <p className="text-[11px] text-[#5A544F] leading-relaxed">
-                    💡 <strong>사용법:</strong> 우측 캔버스에서 각 요일 일정을 <strong>마우스나 터치로 끌어서(드래그)</strong> 원하는 틀의 빈칸 위치에 맞추세요.
+                    캔버스에서 각 요일 일정을 마우스나 터치로 끌어서 원하는 틀의 빈칸 위치에 맞추세요.
                   </p>
 
                   {/* 반투명 카드 박스 토글 */}
@@ -916,7 +916,7 @@ export const EditorSidebar: React.FC<SidebarProps> = ({
                 className="w-full h-2 bg-[#E5DFD5] rounded-lg appearance-none cursor-pointer accent-[#2C2825]"
               />
               <p className="text-[11px] text-[#5A544F] leading-relaxed">
-                ✨ <strong>텍스트와 일정 내용은 100% 선명하게 유지</strong>되며 박스의 배경색만 투명도를 조절합니다.
+                텍스트와 일정 내용은 선명하게 유지되며 박스의 배경색 투명도만 조절합니다.
               </p>
             </div>
 

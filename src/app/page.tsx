@@ -188,7 +188,7 @@ export default function Home() {
       <nav className="min-h-14 bg-white border-b border-[#E5DFD5] px-3 md:px-6 py-2 flex items-center justify-between shrink-0 z-30 flex-wrap gap-2">
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 rounded-lg bg-[#2C2825] flex items-center justify-center text-[#FBF9F5] font-black text-sm shadow-sm shrink-0">
-            ✦
+            S
           </div>
           <div>
             <h1 className="font-extrabold text-xs md:text-sm tracking-tight text-[#2C2825] flex items-center gap-1.5 whitespace-nowrap">
@@ -201,7 +201,7 @@ export default function Home() {
         {/* 중앙 상단 퀵 날짜 정보 (태블릿 이상 표시) */}
         <div className="hidden lg:flex items-center gap-3 text-xs">
           <div className="bg-[#F5F2EB] px-4 py-1.5 rounded-full border border-[#E5DFD5] text-[#2C2825] font-mono font-medium">
-            🗓️ {config.headerSubtitle} ({config.weekNumber})
+            {config.headerSubtitle} ({config.weekNumber})
           </div>
         </div>
 

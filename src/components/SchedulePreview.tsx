@@ -602,8 +602,6 @@ export const SchedulePreview: React.FC<PreviewProps> = ({
                   </span>
                 </div>
                 <div className="flex gap-1.5 opacity-60">
-                  <span className="text-yellow-300 text-lg">✦</span>
-                  <span className="text-yellow-300 text-sm">★</span>
                 </div>
               </div>
             </div>
