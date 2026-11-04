@@ -12,7 +12,9 @@ import {
   Download, 
   Grid, 
   RefreshCw, 
-  Layers
+  Layers,
+  Eye,
+  Sliders
 } from 'lucide-react';
 
 export default function Home() {
@@ -23,6 +25,8 @@ export default function Home() {
   const [isExporting, setIsExporting] = useState<boolean>(false);
   const [scale, setScale] = useState<number>(0.55);
   const [isLoaded, setIsLoaded] = useState<boolean>(false);
+  // 모바일 전용 뷰어/편집 탭 전환 상태 ('edit' | 'preview')
+  const [mobileViewTab, setMobileViewTab] = useState<'edit' | 'preview'>('preview');
 
   const containerRef = useRef<HTMLDivElement>(null);
   const previewCanvasRef = useRef<HTMLDivElement>(null);
@@ -165,37 +169,63 @@ export default function Home() {
   return (
     <div className="flex flex-col h-screen w-screen overflow-hidden bg-[#FBF9F5] text-[#2C2825]">
       
-      {/* 최상단 네비게이션 글로벌 바 (DESIGN.md Workbench) */}
-      <nav className="h-14 bg-white border-b border-[#E5DFD5] px-6 flex items-center justify-between shrink-0 z-30">
-        <div className="flex items-center gap-3">
-          <div className="w-8 h-8 rounded-lg bg-[#2C2825] flex items-center justify-center text-[#FBF9F5] font-black text-sm shadow-sm">
+      {/* 최상단 네비게이션 글로벌 바 (반응형 모바일 최적화) */}
+      <nav className="min-h-14 bg-white border-b border-[#E5DFD5] px-3 md:px-6 py-2 flex items-center justify-between shrink-0 z-30 flex-wrap gap-2">
+        <div className="flex items-center gap-2.5">
+          <div className="w-8 h-8 rounded-lg bg-[#2C2825] flex items-center justify-center text-[#FBF9F5] font-black text-sm shadow-sm shrink-0">
             ✦
           </div>
           <div>
-            <h1 className="font-extrabold text-sm tracking-tight text-[#2C2825] flex items-center gap-2">
-              Warm Sketchbook Studio <span className="text-[10px] px-1.5 py-0.5 rounded-full bg-[#FF7675]/15 text-[#FF7675] font-mono font-bold">16:9 HD</span>
+            <h1 className="font-extrabold text-xs md:text-sm tracking-tight text-[#2C2825] flex items-center gap-1.5 whitespace-nowrap">
+              Sketchbook Studio <span className="text-[9px] md:text-[10px] px-1.5 py-0.2 rounded-full bg-[#FF7675]/15 text-[#FF7675] font-mono font-bold">16:9</span>
             </h1>
-            <p className="text-[10px] text-[#5A544F]">스트리머 & 크리에이터를 위한 주간 스케줄러 메이커</p>
+            <p className="text-[9px] md:text-[10px] text-[#5A544F] hidden sm:block">스트리머 & 크리에이터 스케줄러</p>
           </div>
         </div>
 
-        {/* 중앙 상단 퀵 날짜 정보 */}
-        <div className="hidden md:flex items-center gap-3 text-xs">
+        {/* 중앙 상단 퀵 날짜 정보 (태블릿 이상 표시) */}
+        <div className="hidden lg:flex items-center gap-3 text-xs">
           <div className="bg-[#F5F2EB] px-4 py-1.5 rounded-full border border-[#E5DFD5] text-[#2C2825] font-mono font-medium">
             🗓️ {config.headerSubtitle} ({config.weekNumber})
           </div>
         </div>
 
-        {/* 우측 주요 내보내기 버튼 및 초기화 버튼 */}
-        <div className="flex items-center gap-2.5">
-          <span className="text-[11px] text-[#8C847D] flex items-center gap-1 font-medium mr-1">
-            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> 자동 저장됨
+        {/* 우측 버튼 그룹 */}
+        <div className="flex items-center gap-1.5 md:gap-2.5 shrink-0">
+          <span className="hidden sm:flex text-[11px] text-[#8C847D] items-center gap-1 font-medium mr-1 whitespace-nowrap">
+            <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" /> 자동 저장
           </span>
+
+          {/* 모바일 화면에서 [수정하기] ↔ [캔버스 보기] 원클릭 탭 버튼 */}
+          <div className="flex lg:hidden bg-[#F5F2EB] p-1 rounded-lg border border-[#E5DFD5]">
+            <button
+              type="button"
+              onClick={() => setMobileViewTab('edit')}
+              className={`px-2.5 py-1 rounded-md text-[11px] font-bold transition-all ${
+                mobileViewTab === 'edit'
+                  ? 'bg-white text-[#2C2825] shadow-sm'
+                  : 'text-[#5A544F]'
+              }`}
+            >
+              설정
+            </button>
+            <button
+              type="button"
+              onClick={() => setMobileViewTab('preview')}
+              className={`px-2.5 py-1 rounded-md text-[11px] font-bold transition-all ${
+                mobileViewTab === 'preview'
+                  ? 'bg-white text-[#2C2825] shadow-sm'
+                  : 'text-[#5A544F]'
+              }`}
+            >
+              미리보기
+            </button>
+          </div>
 
           <button
             onClick={handleResetToDefault}
             title="초기 템플릿으로 되돌리기"
-            className="px-3 py-2 rounded-lg border border-[#E5DFD5] bg-[#F5F2EB] hover:bg-[#E5DFD5] text-[#5A544F] font-bold text-xs transition-all cursor-pointer"
+            className="px-2.5 md:px-3 py-1.5 md:py-2 rounded-lg border border-[#E5DFD5] bg-[#F5F2EB] hover:bg-[#E5DFD5] text-[#5A544F] font-bold text-xs transition-all cursor-pointer whitespace-nowrap shrink-0"
           >
             초기화
           </button>
@@ -203,71 +233,75 @@ export default function Home() {
           <button
             onClick={handleDownloadPng}
             disabled={isExporting}
-            className="flex items-center gap-2 px-5 py-2 rounded-lg bg-[#2C2825] hover:bg-[#1E1B18] text-[#FBF9F5] font-bold text-xs shadow-md transition-all active:translate-y-0.5 disabled:opacity-50 cursor-pointer"
+            className="flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-1.5 md:py-2 rounded-lg bg-[#2C2825] hover:bg-[#1E1B18] text-[#FBF9F5] font-bold text-xs shadow-md transition-all active:translate-y-0.5 disabled:opacity-50 cursor-pointer whitespace-nowrap shrink-0"
           >
             {isExporting ? (
-              <RefreshCw className="w-4 h-4 animate-spin" />
+              <RefreshCw className="w-3.5 h-3.5 animate-spin" />
             ) : (
-              <Download className="w-4 h-4 text-[#FF7675]" />
+              <Download className="w-3.5 h-3.5 text-[#FF7675]" />
             )}
-            {isExporting ? '고화질 렌더링 중...' : '1920×1080 PNG 내보내기'}
+            <span className="hidden sm:inline">1920×1080 </span>PNG 저장
           </button>
         </div>
       </nav>
 
-      {/* 메인 2-패널 작업 영역 */}
-      <div className="flex flex-1 overflow-hidden">
+      {/* 메인 2-패널 작업 영역 (모바일 반응형 지원) */}
+      <div className="flex flex-1 overflow-hidden relative">
         
-        {/* 좌측 에디터 사이드바 */}
-        <EditorSidebar
-          config={config}
-          setConfig={setConfig}
-          days={days}
-          setDays={setDays}
-        />
+        {/* 좌측 에디터 사이드바 (모바일에서는 mobileViewTab에 따라 표시/숨김) */}
+        <div className={`h-full ${mobileViewTab === 'edit' ? 'block w-full' : 'hidden lg:block lg:w-[470px] shrink-0'}`}>
+          <EditorSidebar
+            config={config}
+            setConfig={setConfig}
+            days={days}
+            setDays={setDays}
+          />
+        </div>
 
-        {/* 우측 16:9 실시간 뷰어 캔버스 */}
-        <div className="flex-1 flex flex-col bg-[#F5F2EB] overflow-hidden relative">
+        {/* 우측 16:9 실시간 뷰어 캔버스 (모바일에서는 mobileViewTab에 따라 표시/숨김) */}
+        <div className={`flex-1 flex flex-col bg-[#F5F2EB] overflow-hidden relative ${
+          mobileViewTab === 'preview' ? 'flex w-full' : 'hidden lg:flex'
+        }`}>
           
-          {/* 뷰어 제어 툴바 */}
-          <div className="h-12 bg-white/80 backdrop-blur-md border-b border-[#E5DFD5] px-6 flex items-center justify-between shrink-0">
+          {/* 뷰어 제어 툴바 (모바일 반응형) */}
+          <div className="min-h-12 bg-white/80 backdrop-blur-md border-b border-[#E5DFD5] px-3 md:px-6 py-1.5 flex items-center justify-between shrink-0 flex-wrap gap-2">
             <div className="flex items-center gap-2">
               <span className="w-2.5 h-2.5 rounded-full bg-[#55EFC4] ring-2 ring-[#55EFC4]/30 animate-pulse" />
               <span className="text-xs font-bold text-[#2C2825]">
-                1920 × 1080 Full HD Preview (16:9)
+                1920 × 1080 (16:9)
               </span>
-              <span className="text-[11px] font-mono text-[#8C847D]">
-                | {config.layoutMode === 'bento' ? '비대칭 벤토 스케치북' : '7열 클래식 그리드'}
+              <span className="text-[11px] font-mono text-[#8C847D] hidden sm:inline">
+                | {config.layoutMode === 'bento' ? '스크랩북 벤토' : config.layoutMode === 'notebook' ? '모눈종이 노트' : config.layoutMode === 'polaroid' ? '밤하늘 폴라로이드' : '7열 클래식'}
               </span>
             </div>
 
             {/* 줌 배율 & 가이드라인 토글 */}
             <div className="flex items-center gap-2">
               <div className="flex items-center bg-[#F5F2EB] rounded-lg p-0.5 border border-[#E5DFD5] text-xs">
-                {(['50', '75', 'fit', '100'] as const).map((mode) => (
+                {(['fit', '50', '75', '100'] as const).map((mode) => (
                   <button
                     key={mode}
                     onClick={() => setZoomMode(mode)}
-                    className={`px-2.5 py-1 rounded-md text-[11px] font-semibold transition-all ${
+                    className={`px-2 py-0.5 rounded-md text-[10px] md:text-[11px] font-semibold transition-all ${
                       zoomMode === mode
                         ? 'bg-white text-[#2C2825] font-bold shadow-sm'
                         : 'text-[#5A544F] hover:text-[#2C2825]'
                     }`}
                   >
-                    {mode === 'fit' ? 'Fit (맞춤)' : `${mode}%`}
+                    {mode === 'fit' ? '맞춤' : `${mode}%`}
                   </button>
                 ))}
               </div>
 
               <button
                 onClick={() => setShowGridLines(!showGridLines)}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg border text-xs font-medium transition-all ${
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg border text-[11px] font-medium transition-all ${
                   showGridLines
                     ? 'border-[#FF7675] bg-[#FF7675]/15 text-[#a83639]'
                     : 'border-[#E5DFD5] bg-white text-[#5A544F] hover:bg-[#F5F2EB]'
                 }`}
               >
-                <Grid className="w-3.5 h-3.5" /> 가이드 라인
+                <Grid className="w-3.5 h-3.5" /> <span className="hidden sm:inline">가이드 라인</span>
               </button>
             </div>
           </div>
