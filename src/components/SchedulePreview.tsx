@@ -418,7 +418,7 @@ export const SchedulePreview: React.FC<PreviewProps> = ({
         </header>
 
         {/* ========================================================
-            2. 메인 스케줄 영역 (Bento 또는 Linear)
+            2. 메인 스케줄 영역 (Bento, Linear, 또는 일러스트 모눈종이 Notebook)
            ======================================================== */}
         {config.layoutMode === 'bento' ? (
           <main className="flex-1 my-5 flex flex-col justify-between gap-5">
@@ -431,6 +431,125 @@ export const SchedulePreview: React.FC<PreviewProps> = ({
             <div className="grid grid-cols-4 gap-5 h-[48%]">
               {bottomRowDays.map((day) => renderCard(day, day.isFeatured))}
             </div>
+          </main>
+        ) : config.layoutMode === 'notebook' ? (
+          /* ========================================================
+             일러스트/캐릭터 배치 전용 모눈종이 노트 (Notebook Mode)
+             ======================================================== */
+          <main className="flex-1 my-2 flex items-center justify-between gap-10 relative">
+            
+            {/* 좌측 또는 우측: 캐릭터/일러스트 및 Art By 영역 */}
+            <div className={`flex flex-col justify-end h-full py-6 pointer-events-none ${
+              config.notebookAlign === 'left' ? 'order-2 items-end' : 'order-1 items-start'
+            }`}>
+              {/* Art By 크레딧 뱃지 */}
+              <div className="pointer-events-auto bg-white/90 backdrop-blur-md px-6 py-3.5 rounded-2xl border-2 border-[#2C2825]/15 shadow-[0_8px_20px_rgba(44,40,37,0.08)]">
+                <span className="block text-xs font-black text-[#2C2825]">Art By.</span>
+                <span className="text-sm font-bold text-[#5A544F]">
+                  {config.artByText || '그려주신분 이름'}
+                </span>
+              </div>
+            </div>
+
+            {/* 메인 모눈종이 스케줄 보드 */}
+            <div
+              className={`w-[820px] rounded-3xl border-4 border-[#2C2825]/30 p-8 shadow-[0_12px_36px_rgba(44,40,37,0.12)] relative ${
+                config.notebookAlign === 'left' ? 'order-1' : 'order-2'
+              }`}
+              style={{
+                backgroundColor: hexToRgba(config.cardBgColor, config.cardBgOpacity),
+                backdropFilter: `blur(${config.cardBlur}px)`,
+                WebkitBackdropFilter: `blur(${config.cardBlur}px)`,
+                borderColor: config.cardBorderColor,
+              }}
+            >
+              {/* 모눈종이 격자 패턴 오버레이 */}
+              <div
+                className="absolute inset-0 rounded-3xl pointer-events-none opacity-45"
+                style={{
+                  backgroundImage:
+                    'linear-gradient(to right, rgba(44, 40, 37, 0.12) 1px, transparent 1px), linear-gradient(to bottom, rgba(44, 40, 37, 0.12) 1px, transparent 1px)',
+                  backgroundSize: '20px 20px',
+                }}
+              />
+
+              {/* SCHEDULE 버블 헤더 뱃지 */}
+              <div className="flex flex-col items-center -mt-13 mb-3 relative z-10">
+                <div
+                  className="px-8 py-2 rounded-2xl text-white font-black tracking-widest text-3xl shadow-lg border-2 border-white"
+                  style={{
+                    backgroundColor: '#2C2825',
+                    letterSpacing: '0.15em',
+                    textShadow: '0 2px 4px rgba(0,0,0,0.3)',
+                  }}
+                >
+                  SCHEDULE
+                </div>
+                {/* 기간 캡슐 뱃지 */}
+                <div className="mt-2.5 px-6 py-1.5 rounded-full bg-[#5A544F]/75 backdrop-blur-sm text-white font-mono font-bold text-xs shadow-sm">
+                  {config.headerSubtitle.replace('|', '~')}
+                </div>
+              </div>
+
+              {/* 7일간 리스트 테이블 */}
+              <div className="divide-y-2 divide-[#2C2825]/15 relative z-10">
+                {days.map((day) => (
+                  <div
+                    key={day.id}
+                    className="py-3 px-2 flex items-center justify-between gap-4 transition-all"
+                  >
+                    {/* 요일 영문명 */}
+                    <div className="w-16 shrink-0 flex items-center justify-center">
+                      <span
+                        className="font-black text-sm tracking-wider px-2 py-0.5 rounded-md"
+                        style={{
+                          color: '#2C2825',
+                          backgroundColor: day.isOnline ? `${day.crayonColor}30` : 'rgba(44,40,37,0.06)',
+                        }}
+                      >
+                        {day.dayEnglish}
+                      </span>
+                    </div>
+
+                    {/* 세로 구분선 */}
+                    <div className="w-[1.5px] h-6 bg-[#2C2825]/20 shrink-0" />
+
+                    {/* 일정 제목 및 부가 설명 */}
+                    <div className="flex-1 min-w-0 px-3">
+                      <div className="flex items-center gap-2">
+                        <span
+                          className={`font-black tracking-tight leading-snug truncate ${
+                            day.isOnline ? 'text-[#2C2825]' : 'text-[#8C847D]'
+                          }`}
+                          style={fs(16)}
+                        >
+                          {day.title}
+                        </span>
+                        {!day.isOnline && (
+                          <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-[#FF7675]/15 text-[#a83639]">
+                            휴방
+                          </span>
+                        )}
+                      </div>
+                      {day.description && (
+                        <p
+                          className="text-[#5A544F] font-medium truncate mt-0.5"
+                          style={fs(12)}
+                        >
+                          {day.description}
+                        </p>
+                      )}
+                    </div>
+
+                    {/* 방송 시간 표기 */}
+                    <div className="shrink-0 text-right font-mono font-black text-sm tracking-tight text-[#2C2825] px-2">
+                      {day.time}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
           </main>
         ) : (
           /* ========================================================

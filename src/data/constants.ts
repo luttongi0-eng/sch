@@ -248,4 +248,6 @@ export const INITIAL_CONFIG: ScheduleConfig = {
   fontSizeScale: 100,
   showWashiTape: true,
   showCrayonUnderlines: true,
+  artByText: '그려주신분 이름',
+  notebookAlign: 'right',
 };

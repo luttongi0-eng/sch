@@ -457,33 +457,92 @@ export const EditorSidebar: React.FC<SidebarProps> = ({
               <label className="block text-xs font-bold text-[#2C2825] mb-2 flex items-center gap-1.5">
                 <Layout className="w-4 h-4 text-[#FF7675]" /> 스케줄 레이아웃 모드
               </label>
-              <div className="grid grid-cols-2 gap-2.5">
+              <div className="grid grid-cols-3 gap-2">
                 <button
                   type="button"
                   onClick={() => setConfig((prev) => ({ ...prev, layoutMode: 'bento' }))}
-                  className={`p-3 rounded-xl border text-left transition-all ${
+                  className={`p-2.5 rounded-xl border text-left transition-all ${
                     config.layoutMode === 'bento'
                       ? 'border-[#2C2825] bg-[#F5F2EB] font-bold text-[#2C2825] shadow-sm'
                       : 'border-[#E5DFD5] bg-white text-[#5A544F] hover:border-[#8C847D]'
                   }`}
                 >
-                  <div className="text-xs font-bold">스크랩북 2열 벤토</div>
-                  <div className="text-[10px] text-[#8C847D] mt-0.5">상단 4열 + 하단 3열 와이드</div>
+                  <div className="text-xs font-bold">스크랩북 벤토</div>
+                  <div className="text-[10px] text-[#8C847D] mt-0.5">2열 비대칭 와이드</div>
                 </button>
 
                 <button
                   type="button"
                   onClick={() => setConfig((prev) => ({ ...prev, layoutMode: 'linear' }))}
-                  className={`p-3 rounded-xl border text-left transition-all ${
+                  className={`p-2.5 rounded-xl border text-left transition-all ${
                     config.layoutMode === 'linear'
                       ? 'border-[#2C2825] bg-[#F5F2EB] font-bold text-[#2C2825] shadow-sm'
                       : 'border-[#E5DFD5] bg-white text-[#5A544F] hover:border-[#8C847D]'
                   }`}
                 >
-                  <div className="text-xs font-bold">단일 7열 직선형</div>
-                  <div className="text-[10px] text-[#8C847D] mt-0.5">클래식 수평 나열</div>
+                  <div className="text-xs font-bold">7열 클래식</div>
+                  <div className="text-[10px] text-[#8C847D] mt-0.5">가로 7분할 나열</div>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setConfig((prev) => ({ ...prev, layoutMode: 'notebook' }))}
+                  className={`p-2.5 rounded-xl border text-left transition-all ${
+                    config.layoutMode === 'notebook'
+                      ? 'border-[#2C2825] bg-[#F5F2EB] font-bold text-[#2C2825] shadow-sm'
+                      : 'border-[#E5DFD5] bg-white text-[#5A544F] hover:border-[#8C847D]'
+                  }`}
+                >
+                  <div className="text-xs font-bold">모눈종이 노트</div>
+                  <div className="text-[10px] text-[#8C847D] mt-0.5">일러스트/캐릭터용</div>
                 </button>
               </div>
+
+              {/* 모눈종이 노트 모드일 때 전용 옵션 */}
+              {config.layoutMode === 'notebook' && (
+                <div className="mt-3 p-3 bg-[#F5F2EB] border border-[#E5DFD5] rounded-xl space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[11px] font-bold text-[#2C2825]">스케줄 표 배치 위치</span>
+                    <div className="flex gap-1.5">
+                      <button
+                        type="button"
+                        onClick={() => setConfig((prev) => ({ ...prev, notebookAlign: 'right' }))}
+                        className={`px-2.5 py-1 rounded text-[11px] font-bold transition-all ${
+                          config.notebookAlign !== 'left'
+                            ? 'bg-[#2C2825] text-white'
+                            : 'bg-white text-[#5A544F] border border-[#E5DFD5]'
+                        }`}
+                      >
+                        우측 (좌측 캐릭터)
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setConfig((prev) => ({ ...prev, notebookAlign: 'left' }))}
+                        className={`px-2.5 py-1 rounded text-[11px] font-bold transition-all ${
+                          config.notebookAlign === 'left'
+                            ? 'bg-[#2C2825] text-white'
+                            : 'bg-white text-[#5A544F] border border-[#E5DFD5]'
+                        }`}
+                      >
+                        좌측 (우측 캐릭터)
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] font-bold text-[#2C2825] mb-1">
+                      Art By 크레딧 이름
+                    </label>
+                    <input
+                      type="text"
+                      value={config.artByText || ''}
+                      onChange={(e) => setConfig((prev) => ({ ...prev, artByText: e.target.value }))}
+                      placeholder="그려주신분 이름 / 작가명"
+                      className="w-full px-3 py-1.5 bg-white border border-[#E5DFD5] rounded-md text-xs font-bold text-[#2C2825] outline-none"
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* DESIGN.md: 테마 프리셋 */}
