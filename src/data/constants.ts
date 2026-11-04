@@ -289,6 +289,8 @@ export const INITIAL_CONFIG: ScheduleConfig = {
   artByText: '그려주신분 이름',
   notebookAlign: 'right',
   polaroidPhoto: null,
-  diyShowCardBg: true,
-  diyGlobalWidth: 420,
+  diyShowCardBg: false, // DIY 모드에서는 기본적으로 틀 그림이 보이도록 배경 카드 OFF
+  diyGlobalWidth: 460,
+  diyShowDayBadge: false, // 틀에 이미 요일이 있으므로 기본적으로 요일 뱃지 숨김
+  diyShowHeader: false, // 틀에 이미 헤더가 있으므로 기본적으로 상단 헤더 숨김
 };

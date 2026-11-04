@@ -374,61 +374,63 @@ export const SchedulePreview: React.FC<PreviewProps> = ({
         {/* ========================================================
             1. 헤더 영역 (DESIGN.md: Plus Jakarta Sans + Space Grotesk)
            ======================================================== */}
-        <header className="flex items-center justify-between gap-8 pb-5 border-b border-[#2C2825]/10">
-          <div className="flex items-center gap-7">
-            {/* 타이틀 로고 */}
-            <div className="flex flex-col">
-              <h1
-                className="font-black tracking-tight text-[#2C2825] flex items-center gap-3"
-                style={fs(48)}
-              >
-                <span className="font-serif italic font-normal text-[#FF7675]">Weekly</span>
-                <span>{config.headerTitle}</span>
-              </h1>
-            </div>
-
-            {/* 날짜 및 주차 뱃지 (Space Grotesk 모노 폰트) */}
-            <div className="flex items-center gap-3 bg-[#FFFFFF]/85 backdrop-blur-md px-5 py-2.5 rounded-xl border border-[#2C2825]/10 shadow-[0_2px_8px_rgba(44,40,37,0.04)]">
-              <Calendar className="w-5 h-5 text-[#FF7675]" />
+        {!(config.layoutMode === 'custom_diy' && config.diyShowHeader === false) && (
+          <header className="flex items-center justify-between gap-8 pb-5 border-b border-[#2C2825]/10">
+            <div className="flex items-center gap-7">
+              {/* 타이틀 로고 */}
               <div className="flex flex-col">
-                <span
-                  className="font-mono font-bold text-[#2C2825] tracking-tight"
-                  style={fs(14)}
+                <h1
+                  className="font-black tracking-tight text-[#2C2825] flex items-center gap-3"
+                  style={fs(48)}
                 >
-                  {config.headerSubtitle}
-                </span>
-                <span
-                  className="font-semibold text-[#5A544F]"
-                  style={fs(12)}
-                >
-                  {config.weekNumber}
-                </span>
+                  <span className="font-serif italic font-normal text-[#FF7675]">Weekly</span>
+                  <span>{config.headerTitle}</span>
+                </h1>
               </div>
+
+              {/* 날짜 및 주차 뱃지 (Space Grotesk 모노 폰트) */}
+              <div className="flex items-center gap-3 bg-[#FFFFFF]/85 backdrop-blur-md px-5 py-2.5 rounded-xl border border-[#2C2825]/10 shadow-[0_2px_8px_rgba(44,40,37,0.04)]">
+                <Calendar className="w-5 h-5 text-[#FF7675]" />
+                <div className="flex flex-col">
+                  <span
+                    className="font-mono font-bold text-[#2C2825] tracking-tight"
+                    style={fs(14)}
+                  >
+                    {config.headerSubtitle}
+                  </span>
+                  <span
+                    className="font-semibold text-[#5A544F]"
+                    style={fs(12)}
+                  >
+                    {config.weekNumber}
+                  </span>
+                </div>
+              </div>
+
+              {/* 공지사항 티커 (Crayon Coral & Paper Sheet) */}
+              {config.noticeText && (
+                <div className="flex items-center gap-3 bg-[#FFFFFF]/80 backdrop-blur-md px-6 py-2.5 rounded-full border border-[#2C2825]/10 shadow-[0_2px_6px_rgba(44,40,37,0.04)] max-w-xl">
+                  <span className="bg-[#FF7675] text-[#FFFFFF] text-[11px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1 shadow-sm">
+                    <Bell className="w-3 h-3" /> Notice
+                  </span>
+                  <span
+                    className="font-medium text-[#2C2825] truncate"
+                    style={fs(14)}
+                  >
+                    {config.noticeText}
+                  </span>
+                </div>
+              )}
             </div>
 
-            {/* 공지사항 티커 (Crayon Coral & Paper Sheet) */}
-            {config.noticeText && (
-              <div className="flex items-center gap-3 bg-[#FFFFFF]/80 backdrop-blur-md px-6 py-2.5 rounded-full border border-[#2C2825]/10 shadow-[0_2px_6px_rgba(44,40,37,0.04)] max-w-xl">
-                <span className="bg-[#FF7675] text-[#FFFFFF] text-[11px] font-black px-2.5 py-0.5 rounded-full uppercase tracking-wider flex items-center gap-1 shadow-sm">
-                  <Bell className="w-3 h-3" /> Notice
-                </span>
-                <span
-                  className="font-medium text-[#2C2825] truncate"
-                  style={fs(14)}
-                >
-                  {config.noticeText}
-                </span>
+            {/* 우측 플랫폼/채널 태그 */}
+            <div className="flex items-center gap-3">
+              <div className="px-5 py-2 rounded-xl bg-[#FFFFFF]/80 backdrop-blur-md border border-[#2C2825]/10 shadow-[0_2px_6px_rgba(44,40,37,0.04)] text-[#2C2825] font-mono font-bold text-xs tracking-wider">
+                {config.channelTags}
               </div>
-            )}
-          </div>
-
-          {/* 우측 플랫폼/채널 태그 */}
-          <div className="flex items-center gap-3">
-            <div className="px-5 py-2 rounded-xl bg-[#FFFFFF]/80 backdrop-blur-md border border-[#2C2825]/10 shadow-[0_2px_6px_rgba(44,40,37,0.04)] text-[#2C2825] font-mono font-bold text-xs tracking-wider">
-              {config.channelTags}
             </div>
-          </div>
-        </header>
+          </header>
+        )}
 
         {/* ========================================================
             2. 메인 스케줄 영역 (Bento, Linear, 또는 일러스트 모눈종이 Notebook)
@@ -740,25 +742,29 @@ export const SchedulePreview: React.FC<PreviewProps> = ({
                 >
                   {/* 드래그 가능 핸들 가이드 (호버 시 표시) */}
                   <div className="flex items-center justify-between gap-3">
-                    {/* 요일 원형 뱃지 */}
-                    <div className="flex items-center gap-2 shrink-0">
-                      <span
-                        className="w-8 h-8 rounded-xl font-black text-xs flex items-center justify-center text-white shadow-sm"
-                        style={{ backgroundColor: day.crayonColor }}
-                      >
-                        {day.day}
-                      </span>
-                      <span
-                        className={`font-mono font-bold text-xs ${
-                          config.diyShowCardBg !== false ? 'text-[#5A544F]' : 'text-current'
-                        }`}
-                      >
-                        {day.dayEnglish} {day.dateStr}
-                      </span>
-                    </div>
+                    {/* 요일 원형 뱃지 (옵션으로 켜고 끄기 가능) */}
+                    {config.diyShowDayBadge !== false && (
+                      <>
+                        <div className="flex items-center gap-2 shrink-0">
+                          <span
+                            className="w-8 h-8 rounded-xl font-black text-xs flex items-center justify-center text-white shadow-sm"
+                            style={{ backgroundColor: day.crayonColor }}
+                          >
+                            {day.day}
+                          </span>
+                          <span
+                            className={`font-mono font-bold text-xs ${
+                              config.diyShowCardBg !== false ? 'text-[#5A544F]' : 'text-current'
+                            }`}
+                          >
+                            {day.dayEnglish} {day.dateStr}
+                          </span>
+                        </div>
 
-                    {/* 세로 구분선 */}
-                    <div className="w-[1.5px] h-5 bg-[#2C2825]/20 shrink-0" />
+                        {/* 세로 구분선 */}
+                        <div className="w-[1.5px] h-5 bg-[#2C2825]/20 shrink-0" />
+                      </>
+                    )}
 
                     {/* 메인 일정 타이틀 */}
                     <div className="flex-1 min-w-0">
@@ -788,7 +794,7 @@ export const SchedulePreview: React.FC<PreviewProps> = ({
                     </div>
 
                     {/* 방송 시간 */}
-                    <div className="shrink-0 font-mono font-black text-xs tracking-tight text-right w-20">
+                    <div className="shrink-0 font-mono font-black text-xs tracking-tight text-right min-w-[60px]">
                       {day.time}
                     </div>
                   </div>

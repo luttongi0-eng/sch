@@ -583,6 +583,7 @@ export const EditorSidebar: React.FC<SidebarProps> = ({
                     💡 <strong>사용법:</strong> 우측 캔버스에서 각 요일 일정을 <strong>마우스나 터치로 끌어서(드래그)</strong> 원하는 틀의 빈칸 위치에 맞추세요.
                   </p>
 
+                  {/* 반투명 카드 박스 토글 */}
                   <div className="pt-2 border-t border-[#FF7675]/20 flex items-center justify-between">
                     <div>
                       <span className="text-[11px] font-bold text-[#2C2825] block">반투명 카드 박스 표시</span>
@@ -592,6 +593,34 @@ export const EditorSidebar: React.FC<SidebarProps> = ({
                       type="checkbox"
                       checked={config.diyShowCardBg !== false}
                       onChange={(e) => setConfig((prev) => ({ ...prev, diyShowCardBg: e.target.checked }))}
+                      className="w-4 h-4 accent-[#2C2825] cursor-pointer"
+                    />
+                  </div>
+
+                  {/* 요일 원형 뱃지 및 영문명 표시 토글 */}
+                  <div className="pt-2 border-t border-[#FF7675]/20 flex items-center justify-between">
+                    <div>
+                      <span className="text-[11px] font-bold text-[#2C2825] block">요일 뱃지 (월, 화, WED 등) 표시</span>
+                      <span className="text-[9px] text-[#8C847D]">틀 배경에 이미 요일이 적혀있다면 체크를 끄세요</span>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={config.diyShowDayBadge !== false}
+                      onChange={(e) => setConfig((prev) => ({ ...prev, diyShowDayBadge: e.target.checked }))}
+                      className="w-4 h-4 accent-[#2C2825] cursor-pointer"
+                    />
+                  </div>
+
+                  {/* 상단 헤더 (Weekly Schedule, 기간/주차, 공지) 표시 토글 */}
+                  <div className="pt-2 border-t border-[#FF7675]/20 flex items-center justify-between">
+                    <div>
+                      <span className="text-[11px] font-bold text-[#2C2825] block">상단 헤더 (Weekly 타이틀 & 기간/주차) 표시</span>
+                      <span className="text-[9px] text-[#8C847D]">틀 배경에 이미 제목/SCHEDULE이 있다면 끄세요</span>
+                    </div>
+                    <input
+                      type="checkbox"
+                      checked={config.diyShowHeader !== false}
+                      onChange={(e) => setConfig((prev) => ({ ...prev, diyShowHeader: e.target.checked }))}
                       className="w-4 h-4 accent-[#2C2825] cursor-pointer"
                     />
                   </div>

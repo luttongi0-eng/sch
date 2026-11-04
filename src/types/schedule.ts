@@ -80,6 +80,8 @@ export interface ScheduleConfig {
   // DIY 커스텀 모드 설정
   diyShowCardBg?: boolean; // DIY 요일 박스에 반투명 배경 카드를 씌울지, 텍스트만 깔끔하게 올릴지 여부
   diyGlobalWidth?: number; // DIY 요일 박스 공통 너비
+  diyShowDayBadge?: boolean; // 요일 원형 뱃지 및 영문 요일명 표시 여부 (틀에 이미 요일이 적혀있는 경우 숨김)
+  diyShowHeader?: boolean; // 상단 헤더(Weekly Schedule 타이틀, 기간/주차, 공지, 채널 태그) 표시 여부
 }
 
 export interface PlacedSticker {
