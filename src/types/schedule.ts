@@ -18,7 +18,7 @@ export interface DaySchedule {
   isFeatured?: boolean; // 벤토 레이아웃에서 2칸 와이드로 크게 강조할 요일 여부
 }
 
-export type LayoutMode = 'bento' | 'linear' | 'notebook';
+export type LayoutMode = 'bento' | 'linear' | 'notebook' | 'polaroid';
 export type TextureMode = 'grain' | 'grid' | 'plain';
 export type ImageSizeMode = 'cover' | 'contain' | 'fill'; // 확대(꽉 채움) / 맞춤(비율유지) / 늘리기
 
@@ -69,4 +69,5 @@ export interface ScheduleConfig {
   // 일러스트 / 캐릭터 스케줄러 전용 설정
   artByText?: string; // "그려주신분 이름"
   notebookAlign?: 'left' | 'right'; // 스케줄 표 위치 (우측 또는 좌측)
+  polaroidPhoto?: string | null; // 폴라로이드 프레임 내에 넣을 사진/일러스트 (선택)
 }

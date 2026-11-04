@@ -457,7 +457,7 @@ export const EditorSidebar: React.FC<SidebarProps> = ({
               <label className="block text-xs font-bold text-[#2C2825] mb-2 flex items-center gap-1.5">
                 <Layout className="w-4 h-4 text-[#FF7675]" /> 스케줄 레이아웃 모드
               </label>
-              <div className="grid grid-cols-3 gap-2">
+              <div className="grid grid-cols-2 gap-2">
                 <button
                   type="button"
                   onClick={() => setConfig((prev) => ({ ...prev, layoutMode: 'bento' }))}
@@ -496,7 +496,74 @@ export const EditorSidebar: React.FC<SidebarProps> = ({
                   <div className="text-xs font-bold">모눈종이 노트</div>
                   <div className="text-[10px] text-[#8C847D] mt-0.5">일러스트/캐릭터용</div>
                 </button>
+
+                <button
+                  type="button"
+                  onClick={() => setConfig((prev) => ({ ...prev, layoutMode: 'polaroid' }))}
+                  className={`p-2.5 rounded-xl border text-left transition-all ${
+                    config.layoutMode === 'polaroid'
+                      ? 'border-[#2C2825] bg-[#F5F2EB] font-bold text-[#2C2825] shadow-sm'
+                      : 'border-[#E5DFD5] bg-white text-[#5A544F] hover:border-[#8C847D]'
+                  }`}
+                >
+                  <div className="text-xs font-bold">밤하늘 폴라로이드</div>
+                  <div className="text-[10px] text-[#8C847D] mt-0.5">액자 프레임 & 캡슐 바</div>
+                </button>
               </div>
+
+              {/* 폴라로이드 모드 전용 사진 업로드 & 작가명 옵션 */}
+              {config.layoutMode === 'polaroid' && (
+                <div className="mt-3 p-3 bg-[#F5F2EB] border border-[#E5DFD5] rounded-xl space-y-3">
+                  <span className="text-[11px] font-bold text-[#2C2825] block">
+                    폴라로이드 액자 사진 & 크레딧
+                  </span>
+                  <div>
+                    <label className="block text-[10px] font-semibold text-[#5A544F] mb-1">
+                      액자 전용 사진 업로드 (선택사항)
+                    </label>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onload = (event) => {
+                            setConfig((prev) => ({
+                              ...prev,
+                              polaroidPhoto: event.target?.result as string,
+                            }));
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                      className="text-xs text-[#5A544F] file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-[#2C2825] file:text-white cursor-pointer"
+                    />
+                    {config.polaroidPhoto && (
+                      <button
+                        type="button"
+                        onClick={() => setConfig((prev) => ({ ...prev, polaroidPhoto: null }))}
+                        className="mt-1 text-[10px] text-[#FF7675] hover:underline"
+                      >
+                        사진 제거
+                      </button>
+                    )}
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-semibold text-[#5A544F] mb-1">
+                      ARTIST. 크레딧 이름
+                    </label>
+                    <input
+                      type="text"
+                      value={config.artByText || ''}
+                      onChange={(e) => setConfig((prev) => ({ ...prev, artByText: e.target.value }))}
+                      placeholder="그려주신분 이름 / 작가명"
+                      className="w-full px-3 py-1.5 bg-white border border-[#E5DFD5] rounded-md text-xs font-bold text-[#2C2825] outline-none"
+                    />
+                  </div>
+                </div>
+              )}
 
               {/* 모눈종이 노트 모드일 때 전용 옵션 */}
               {config.layoutMode === 'notebook' && (

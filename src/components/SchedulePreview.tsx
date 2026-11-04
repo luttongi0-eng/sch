@@ -551,6 +551,127 @@ export const SchedulePreview: React.FC<PreviewProps> = ({
             </div>
 
           </main>
+        ) : config.layoutMode === 'polaroid' ? (
+          /* ========================================================
+             폴라로이드 프레임 & 캡슐 바 (Night Sky Polaroid Mode)
+             ======================================================== */
+          <main className="flex-1 my-2 flex items-center justify-between gap-12 relative">
+            
+            {/* 좌측 폴라로이드 액자 프레임 */}
+            <div className="w-[580px] h-[720px] bg-[#3E3A36] rounded-3xl p-6 border-4 border-[#2C2825]/30 shadow-[0_16px_40px_rgba(0,0,0,0.3)] flex flex-col justify-between shrink-0 relative overflow-hidden">
+              {/* 사진 영역 */}
+              <div className="w-full flex-1 bg-[#D3CECA] rounded-2xl border-2 border-black/10 overflow-hidden relative flex items-center justify-center">
+                {config.polaroidPhoto || config.userBgImage ? (
+                  <img
+                    src={config.polaroidPhoto || config.userBgImage!}
+                    alt="Artist Profile"
+                    className="w-full h-full object-cover"
+                  />
+                ) : (
+                  <div className="text-center p-6 text-[#5A544F]">
+                    <div className="text-4xl mb-2 opacity-60">🖼️</div>
+                    <p className="font-bold text-sm">일러스트 / 프로필 사진</p>
+                    <p className="text-[11px] opacity-75 mt-1">에디터에서 사진을 등록할 수 있습니다</p>
+                  </div>
+                )}
+              </div>
+
+              {/* 하단 ARTIST 크레딧 라벨 */}
+              <div className="pt-5 pb-2 flex items-center justify-between">
+                <div>
+                  <span className="font-black text-xl tracking-wider text-[#FBF9F5] block">
+                    ARTIST.
+                  </span>
+                  <span className="text-sm font-bold text-[#D3CECA]">
+                    {config.artByText || '그려주신분 이름'}
+                  </span>
+                </div>
+                <div className="flex gap-1.5 opacity-60">
+                  <span className="text-yellow-300 text-lg">✦</span>
+                  <span className="text-yellow-300 text-sm">★</span>
+                </div>
+              </div>
+            </div>
+
+            {/* 우측 SCHEDULE 타이틀 & 7개 둥근 캡슐 바 */}
+            <div className="flex-1 flex flex-col justify-center h-full max-w-[880px] z-10">
+              
+              {/* 상단 굵은 입체 SCHEDULE 타이틀 */}
+              <div className="flex items-center justify-between mb-4">
+                <h2
+                  className="font-black tracking-widest text-4xl text-white drop-shadow-[0_4px_8px_rgba(0,0,0,0.5)]"
+                  style={{
+                    letterSpacing: '0.12em',
+                    textShadow: '3px 3px 0 #2C2825, -2px -2px 0 #2C2825, 2px -2px 0 #2C2825, -2px 2px 0 #2C2825',
+                  }}
+                >
+                  SCHEDULE
+                </h2>
+                <span className="px-4 py-1.5 rounded-full bg-white/20 backdrop-blur-md text-white font-mono font-bold text-xs border border-white/25">
+                  {config.headerSubtitle.replace('|', '~')}
+                </span>
+              </div>
+
+              {/* 7개 요일 캡슐 바 리스트 */}
+              <div className="space-y-3.5">
+                {days.map((day) => (
+                  <div key={day.id} className="flex items-center gap-3">
+                    {/* 달과 구름 요일 뱃지 */}
+                    <div className="relative w-13 h-13 rounded-full bg-white border-2 border-[#2C2825] flex items-center justify-center shrink-0 shadow-md">
+                      {/* 초승달 장식 */}
+                      <span className="absolute -top-1.5 -right-1 text-sm select-none">🌙</span>
+                      <span className="font-black text-base text-[#2C2825] z-10">
+                        {day.day}
+                      </span>
+                    </div>
+
+                    {/* 흰색 둥근 캡슐 일정 바 */}
+                    <div
+                      className="flex-1 bg-white rounded-full px-6 py-2.5 border-2 border-[#2C2825]/15 shadow-[0_4px_12px_rgba(0,0,0,0.06)] flex items-center justify-between transition-all"
+                      style={{
+                        backgroundColor: day.isOnline ? '#FFFFFF' : '#F5F2EB',
+                      }}
+                    >
+                      {/* 일정 제목 */}
+                      <div className="flex items-center gap-3 min-w-0 flex-1 pr-4">
+                        <span
+                          className={`font-black truncate ${
+                            day.isOnline ? 'text-[#2C2825]' : 'text-[#8C847D]'
+                          }`}
+                          style={fs(16)}
+                        >
+                          {day.title}
+                        </span>
+                        {!day.isOnline && (
+                          <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-[#FF7675]/15 text-[#a83639] shrink-0">
+                            휴방
+                          </span>
+                        )}
+                        {day.description && day.isOnline && (
+                          <span
+                            className="text-[#8C847D] text-xs font-semibold truncate hidden md:inline"
+                            style={fs(12)}
+                          >
+                            - {day.description}
+                          </span>
+                        )}
+                      </div>
+
+                      {/* 세로 구분선 */}
+                      <div className="w-[1.5px] h-5 bg-[#2C2825]/20 shrink-0 mx-2" />
+
+                      {/* 방송 시간 표기 */}
+                      <div className="shrink-0 font-mono font-black text-sm tracking-tight text-[#2C2825] w-24 text-right">
+                        {day.time}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+            </div>
+
+          </main>
         ) : (
           /* ========================================================
              3. 클래식 7열 직선형 (Linear 7 Columns)

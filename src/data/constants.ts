@@ -250,4 +250,5 @@ export const INITIAL_CONFIG: ScheduleConfig = {
   showCrayonUnderlines: true,
   artByText: '그려주신분 이름',
   notebookAlign: 'right',
+  polaroidPhoto: null,
 };
