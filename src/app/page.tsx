@@ -27,17 +27,22 @@ export default function Home() {
   const containerRef = useRef<HTMLDivElement>(null);
   const previewCanvasRef = useRef<HTMLDivElement>(null);
 
-  // 1. 첫 마운트 시 localStorage에서 이전에 저장된 스케줄 데이터 불러오기
+  // 1. 첫 마운트 시 localStorage에서 불러오되, 날짜는 항상 오늘 주차 기준으로 자동 업데이트!
   useEffect(() => {
     try {
       const savedConfig = localStorage.getItem('crayoncast_config');
       const savedDays = localStorage.getItem('crayoncast_days');
+      const weekInfo = getWeekDates();
 
       if (savedConfig) {
-        setConfig((prev) => ({ ...prev, ...JSON.parse(savedConfig) }));
+        const parsed = JSON.parse(savedConfig);
+        setConfig({
+          ...parsed,
+          // 사용자가 접속/작성하는 날 기준으로 이번 주 날짜 & 주차 자동 갱신
+          headerSubtitle: weekInfo.headerSubtitle,
+          weekNumber: weekInfo.weekNumber,
+        });
       } else {
-        // 최초 방문 시 오늘 날짜 기준으로 헤더 기간 & 주차 자동 세팅
-        const weekInfo = getWeekDates();
         setConfig((prev) => ({
           ...prev,
           headerSubtitle: weekInfo.headerSubtitle,
@@ -46,9 +51,10 @@ export default function Home() {
       }
 
       if (savedDays) {
-        setDays(JSON.parse(savedDays));
+        const parsedDays: DaySchedule[] = JSON.parse(savedDays);
+        // 저장되어 있던 내용(제목, 시간, 메모 등)은 그대로 보존하고 날짜 표기(03.17 등)만 오늘 주차 날짜로 자동 동기화!
+        setDays(applyCurrentWeekDates(parsedDays));
       } else {
-        // 최초 방문 시 오늘 날짜 기준으로 월~일 날짜 표기 자동 반영
         setDays(applyCurrentWeekDates(INITIAL_DAYS));
       }
     } catch (e) {
