@@ -3,6 +3,7 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { ScheduleConfig, DaySchedule } from '@/types/schedule';
 import { INITIAL_CONFIG, INITIAL_DAYS } from '@/data/constants';
+import { getWeekDates, applyCurrentWeekDates } from '@/utils/dateUtils';
 import { EditorSidebar } from '@/components/EditorSidebar';
 import { SchedulePreview } from '@/components/SchedulePreview';
 import { toPng } from 'html-to-image';
@@ -34,9 +35,21 @@ export default function Home() {
 
       if (savedConfig) {
         setConfig((prev) => ({ ...prev, ...JSON.parse(savedConfig) }));
+      } else {
+        // 최초 방문 시 오늘 날짜 기준으로 헤더 기간 & 주차 자동 세팅
+        const weekInfo = getWeekDates();
+        setConfig((prev) => ({
+          ...prev,
+          headerSubtitle: weekInfo.headerSubtitle,
+          weekNumber: weekInfo.weekNumber,
+        }));
       }
+
       if (savedDays) {
         setDays(JSON.parse(savedDays));
+      } else {
+        // 최초 방문 시 오늘 날짜 기준으로 월~일 날짜 표기 자동 반영
+        setDays(applyCurrentWeekDates(INITIAL_DAYS));
       }
     } catch (e) {
       console.warn('Failed to load saved schedule from localStorage:', e);
@@ -58,9 +71,14 @@ export default function Home() {
 
   // 전체 데이터 초기화 함수
   const handleResetToDefault = () => {
-    if (window.confirm('모든 일정 및 스타일 설정을 초기 상태로 되돌리시겠습니까?')) {
-      setConfig(INITIAL_CONFIG);
-      setDays(INITIAL_DAYS);
+    if (window.confirm('모든 일정 및 스타일 설정을 초기 상태로 되돌리시겠습니까? (날짜는 오늘 주차로 맞춰집니다)')) {
+      const weekInfo = getWeekDates();
+      setConfig({
+        ...INITIAL_CONFIG,
+        headerSubtitle: weekInfo.headerSubtitle,
+        weekNumber: weekInfo.weekNumber,
+      });
+      setDays(applyCurrentWeekDates(INITIAL_DAYS));
       try {
         localStorage.removeItem('crayoncast_config');
         localStorage.removeItem('crayoncast_days');

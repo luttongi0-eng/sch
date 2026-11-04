@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { DaySchedule, ScheduleConfig, LayoutMode, TextureMode } from '@/types/schedule';
 import { THEME_PRESETS, CRAYON_SWATCHES, FONT_OPTIONS } from '@/data/constants';
+import { getWeekDates, applyCurrentWeekDates } from '@/utils/dateUtils';
 import { 
   Palette, 
   Layout, 
@@ -15,7 +16,8 @@ import {
   Type,
   Stamp,
   Layers,
-  Sparkles
+  Sparkles,
+  CalendarCheck
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -120,7 +122,22 @@ export const EditorSidebar: React.FC<SidebarProps> = ({
               <span className="text-xs font-bold text-[#2C2825] flex items-center gap-1.5">
                 <CalendarDays className="w-4 h-4 text-[#FF7675]" /> 월~일 요일별 일정 및 크레용 스와치
               </span>
-              <span className="text-[11px] font-mono text-[#8C847D]">7 DAYS</span>
+              <button
+                type="button"
+                onClick={() => {
+                  const weekInfo = getWeekDates();
+                  setDays((prev) => applyCurrentWeekDates(prev));
+                  setConfig((prev) => ({
+                    ...prev,
+                    headerSubtitle: weekInfo.headerSubtitle,
+                    weekNumber: weekInfo.weekNumber,
+                  }));
+                }}
+                className="flex items-center gap-1 text-[11px] font-bold text-[#FF7675] hover:text-[#d63031] bg-[#FF7675]/10 hover:bg-[#FF7675]/20 px-2 py-1 rounded-md transition-all cursor-pointer"
+                title="오늘 기준 이번 주 월~일 날짜로 일괄 업데이트"
+              >
+                <CalendarCheck className="w-3.5 h-3.5" /> 이번 주 날짜로 맞추기
+              </button>
             </div>
 
             <div className="space-y-2.5">
@@ -217,7 +234,16 @@ export const EditorSidebar: React.FC<SidebarProps> = ({
                           <div className="grid grid-cols-2 gap-2">
                             <button
                               type="button"
-                              onClick={() => updateDay(day.id, { isOnline: true })}
+                              onClick={() => {
+                                updateDay(day.id, {
+                                  isOnline: true,
+                                  time: day.time === '휴방' ? '19:00 KST' : day.time,
+                                  title: day.title === 'OFFLINE' ? '방송 일정' : day.title,
+                                  badge: day.badge === 'REST' ? '소통' : day.badge,
+                                  footerNote: day.footerNote === 'RECHARGE DAY' ? 'Live Stream' : day.footerNote,
+                                  tagIcon: day.tagIcon === 'sleep' ? 'chat' : day.tagIcon,
+                                });
+                              }}
                               className={`py-2 px-3 rounded-lg flex items-center justify-center gap-1.5 font-bold transition-all ${
                                 day.isOnline
                                   ? 'bg-[#2C2825] text-[#FBF9F5] shadow-sm'
@@ -228,7 +254,17 @@ export const EditorSidebar: React.FC<SidebarProps> = ({
                             </button>
                             <button
                               type="button"
-                              onClick={() => updateDay(day.id, { isOnline: false })}
+                              onClick={() => {
+                                updateDay(day.id, {
+                                  isOnline: false,
+                                  time: '휴방',
+                                  title: 'OFFLINE',
+                                  description: '',
+                                  badge: 'REST',
+                                  footerNote: 'RECHARGE DAY',
+                                  tagIcon: 'sleep',
+                                });
+                              }}
                               className={`py-2 px-3 rounded-lg flex items-center justify-center gap-1.5 font-bold transition-all ${
                                 !day.isOnline
                                   ? 'bg-[#FF7675] text-white shadow-sm'
@@ -730,6 +766,32 @@ export const EditorSidebar: React.FC<SidebarProps> = ({
                 onChange={(e) => setConfig((prev) => ({ ...prev, headerTitle: e.target.value }))}
                 className="w-full px-3 py-2 bg-white border border-[#E5DFD5] rounded-lg text-[#2C2825] font-semibold focus:border-[#2C2825] outline-none"
               />
+            </div>
+
+            <div className="p-3 bg-[#F5F2EB] rounded-xl border border-[#E5DFD5] space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-[#2C2825] flex items-center gap-1.5">
+                  <CalendarDays className="w-4 h-4 text-[#FF7675]" /> 이번 주 날짜로 자동 동기화
+                </span>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const weekInfo = getWeekDates();
+                    setDays((prev) => applyCurrentWeekDates(prev));
+                    setConfig((prev) => ({
+                      ...prev,
+                      headerSubtitle: weekInfo.headerSubtitle,
+                      weekNumber: weekInfo.weekNumber,
+                    }));
+                  }}
+                  className="px-2.5 py-1 bg-white hover:bg-[#2C2825] text-[#2C2825] hover:text-white border border-[#E5DFD5] rounded-md font-bold text-[11px] transition-all cursor-pointer shadow-sm"
+                >
+                  지금 동기화
+                </button>
+              </div>
+              <p className="text-[10px] text-[#8C847D]">
+                오늘 날짜를 기준으로 이번 주 월~일 날짜, 연도/기간, 주차 뱃지를 일괄 계산하여 적용합니다.
+              </p>
             </div>
 
             <div className="grid grid-cols-2 gap-2">
