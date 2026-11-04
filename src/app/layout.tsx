@@ -17,6 +17,12 @@ const spaceGrotesk = Space_Grotesk({
 export const metadata: Metadata = {
   title: "CrayonCast Studio - Warm Sketchbook Schedule Maker",
   description: "16:9 Full HD Custom Schedule Maker for Streamers and Creators",
+  colorScheme: "light",
+};
+
+export const viewport = {
+  colorScheme: "light",
+  themeColor: "#FBF9F5",
 };
 
 export default function RootLayout({

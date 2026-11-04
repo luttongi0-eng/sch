@@ -69,11 +69,16 @@
   --font-mono: var(--font-space-grotesk), monospace;
 }
 
+html {
+  color-scheme: light only;
+}
+
 body {
   background: var(--surface-canvas);
   color: var(--ink-charcoal);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  color-scheme: light only;
 }
 
 /* 캔버스 내부 요소들이 선택된 폰트를 상속받고 글씨 크기 배율을 즉각 반영하도록 설정 */
