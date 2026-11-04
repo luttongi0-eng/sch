@@ -1,8 +1,8 @@
 'use client';
 
 import React, { useState } from 'react';
-import { DaySchedule, ScheduleConfig, LayoutMode, TextureMode } from '@/types/schedule';
-import { THEME_PRESETS, CRAYON_SWATCHES, FONT_OPTIONS } from '@/data/constants';
+import { DaySchedule, ScheduleConfig, LayoutMode, TextureMode, PlacedSticker } from '@/types/schedule';
+import { THEME_PRESETS, CRAYON_SWATCHES, FONT_OPTIONS, PRESET_STICKERS } from '@/data/constants';
 import { getWeekDates, applyCurrentWeekDates } from '@/utils/dateUtils';
 import { 
   Palette, 
@@ -17,7 +17,11 @@ import {
   Stamp,
   Layers,
   Sparkles,
-  CalendarCheck
+  CalendarCheck,
+  Sticker,
+  Plus,
+  Trash2,
+  Image as ImageIcon
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -25,6 +29,8 @@ interface SidebarProps {
   setConfig: React.Dispatch<React.SetStateAction<ScheduleConfig>>;
   days: DaySchedule[];
   setDays: React.Dispatch<React.SetStateAction<DaySchedule[]>>;
+  stickers: PlacedSticker[];
+  setStickers: React.Dispatch<React.SetStateAction<PlacedSticker[]>>;
 }
 
 export const EditorSidebar: React.FC<SidebarProps> = ({
@@ -32,8 +38,10 @@ export const EditorSidebar: React.FC<SidebarProps> = ({
   setConfig,
   days,
   setDays,
+  stickers,
+  setStickers,
 }) => {
-  const [activeTab, setActiveTab] = useState<'schedule' | 'style' | 'header'>('schedule');
+  const [activeTab, setActiveTab] = useState<'schedule' | 'style' | 'header' | 'sticker'>('schedule');
   const [expandedDayId, setExpandedDayId] = useState<string | null>('mon');
 
   const updateDay = (id: string, updates: Partial<DaySchedule>) => {
@@ -77,37 +85,47 @@ export const EditorSidebar: React.FC<SidebarProps> = ({
           </span>
         </div>
 
-        {/* 탭 버튼들 */}
-        <div className="grid grid-cols-3 gap-1 p-1 bg-[#F5F2EB] rounded-lg text-xs font-semibold text-[#5A544F]">
+        {/* 탭 버튼들 (4개 탭) */}
+        <div className="grid grid-cols-4 gap-1 p-1 bg-[#F5F2EB] rounded-lg text-xs font-semibold text-[#5A544F]">
           <button
             onClick={() => setActiveTab('schedule')}
-            className={`py-1.5 rounded-md transition-all flex items-center justify-center gap-1.5 ${
+            className={`py-1.5 rounded-md transition-all flex items-center justify-center gap-1 ${
               activeTab === 'schedule'
                 ? 'bg-white text-[#2C2825] shadow-sm font-bold'
                 : 'hover:text-[#2C2825]'
             }`}
           >
-            <CalendarDays className="w-3.5 h-3.5" /> 요일별 일정
+            <CalendarDays className="w-3.5 h-3.5" /> <span className="truncate">일정</span>
           </button>
           <button
             onClick={() => setActiveTab('style')}
-            className={`py-1.5 rounded-md transition-all flex items-center justify-center gap-1.5 ${
+            className={`py-1.5 rounded-md transition-all flex items-center justify-center gap-1 ${
               activeTab === 'style'
                 ? 'bg-white text-[#2C2825] shadow-sm font-bold'
                 : 'hover:text-[#2C2825]'
             }`}
           >
-            <Palette className="w-3.5 h-3.5" /> 테마 & 질감
+            <Palette className="w-3.5 h-3.5" /> <span className="truncate">테마</span>
+          </button>
+          <button
+            onClick={() => setActiveTab('sticker')}
+            className={`py-1.5 rounded-md transition-all flex items-center justify-center gap-1 ${
+              activeTab === 'sticker'
+                ? 'bg-white text-[#2C2825] shadow-sm font-bold'
+                : 'hover:text-[#2C2825]'
+            }`}
+          >
+            <Sticker className="w-3.5 h-3.5 text-[#FF7675]" /> <span className="truncate font-bold text-[#FF7675]">스티커</span>
           </button>
           <button
             onClick={() => setActiveTab('header')}
-            className={`py-1.5 rounded-md transition-all flex items-center justify-center gap-1.5 ${
+            className={`py-1.5 rounded-md transition-all flex items-center justify-center gap-1 ${
               activeTab === 'header'
                 ? 'bg-white text-[#2C2825] shadow-sm font-bold'
                 : 'hover:text-[#2C2825]'
             }`}
           >
-            <Type className="w-3.5 h-3.5" /> 헤더 & 정보
+            <Type className="w-3.5 h-3.5" /> <span className="truncate">헤더</span>
           </button>
         </div>
       </div>
@@ -966,7 +984,142 @@ export const EditorSidebar: React.FC<SidebarProps> = ({
           </div>
         )}
 
-        {/* 탭 3: 헤더 & 정보 탭 */}
+        {/* 탭 3: 스티커 꾸미기 탭 */}
+        {activeTab === 'sticker' && (
+          <div className="space-y-5 text-xs">
+            {/* 기본 스티커 팔레트 */}
+            <div className="p-4 bg-white border border-[#E5DFD5] rounded-xl space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-[#2C2825] flex items-center gap-1.5">
+                  <Sparkles className="w-4 h-4 text-[#FF7675]" /> 기본 프리셋 스티커
+                </span>
+                <span className="text-[10px] text-[#8C847D]">클릭 시 화면에 추가</span>
+              </div>
+              <div className="grid grid-cols-4 gap-2">
+                {PRESET_STICKERS.map((st) => (
+                  <button
+                    key={st.id}
+                    type="button"
+                    onClick={() => {
+                      const newSticker: PlacedSticker = {
+                        id: 'sticker_' + Date.now() + '_' + Math.random().toString(36).substr(2, 4),
+                        type: 'emoji',
+                        content: st.content,
+                        x: 960 - 40,
+                        y: 540 - 40,
+                        size: 70,
+                        rotation: 0,
+                      };
+                      setStickers((prev) => [...prev, newSticker]);
+                    }}
+                    className="p-2.5 bg-[#FBF9F5] hover:bg-[#F5F2EB] border border-[#E5DFD5] hover:border-[#2C2825] rounded-xl flex flex-col items-center justify-center gap-1 transition-all group cursor-pointer"
+                  >
+                    <span className="text-2xl group-hover:scale-115 transition-transform">{st.content}</span>
+                    <span className="text-[10px] font-medium text-[#5A544F]">{st.label}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            {/* 사용자 커스텀 PNG 스티커 업로드 */}
+            <div className="p-4 bg-white border border-[#E5DFD5] rounded-xl space-y-3">
+              <span className="font-bold text-[#2C2825] flex items-center gap-1.5">
+                <ImageIcon className="w-4 h-4 text-[#FF7675]" /> 나만의 PNG 스티커 업로드
+              </span>
+              <p className="text-[11px] text-[#5A544F]">
+                투명 배경(PNG)의 캐릭터 도트, 배지, 싸인, 팬아트 스티커를 올려서 스케줄표에 자유롭게 붙일 수 있습니다.
+              </p>
+              <div>
+                <label className="flex items-center justify-center gap-2 w-full py-2.5 bg-[#2C2825] hover:bg-[#1E1B18] text-white rounded-lg font-bold text-xs cursor-pointer shadow-sm transition-all">
+                  <Plus className="w-4 h-4 text-[#FF7675]" />
+                  PNG 스티커 파일 추가
+                  <input
+                    type="file"
+                    accept="image/png, image/webp, image/gif"
+                    className="hidden"
+                    onChange={(e) => {
+                      const file = e.target.files?.[0];
+                      if (file) {
+                        const reader = new FileReader();
+                        reader.onload = (event) => {
+                          const base64 = event.target?.result as string;
+                          const newSticker: PlacedSticker = {
+                            id: 'custom_stk_' + Date.now(),
+                            type: 'image',
+                            content: base64,
+                            x: 960 - 60,
+                            y: 540 - 60,
+                            size: 110,
+                            rotation: 0,
+                          };
+                          setStickers((prev) => [...prev, newSticker]);
+                        };
+                        reader.readAsDataURL(file);
+                        e.target.value = '';
+                      }
+                    }}
+                  />
+                </label>
+              </div>
+            </div>
+
+            {/* 현재 부착된 스티커 목록 & 관리 */}
+            <div className="p-4 bg-[#F5F2EB] border border-[#E5DFD5] rounded-xl space-y-2.5">
+              <div className="flex items-center justify-between">
+                <span className="font-bold text-[#2C2825]">부착된 스티커 목록 ({stickers.length}개)</span>
+                {stickers.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      if (window.confirm('캔버스에 부착된 모든 스티커를 지우시겠습니까?')) {
+                        setStickers([]);
+                      }
+                    }}
+                    className="text-[10px] text-[#FF7675] hover:underline font-bold"
+                  >
+                    전체 삭제
+                  </button>
+                )}
+              </div>
+
+              {stickers.length === 0 ? (
+                <p className="text-[11px] text-[#8C847D] py-2 text-center">
+                  아직 부착된 스티커가 없습니다. 위에서 스티커를 추가해 보세요!
+                </p>
+              ) : (
+                <div className="space-y-1.5 max-h-48 overflow-y-auto pr-1">
+                  {stickers.map((st, idx) => (
+                    <div
+                      key={st.id}
+                      className="p-2 bg-white rounded-lg border border-[#E5DFD5] flex items-center justify-between text-xs"
+                    >
+                      <div className="flex items-center gap-2">
+                        {st.type === 'emoji' ? (
+                          <span className="text-lg">{st.content}</span>
+                        ) : (
+                          <img src={st.content} alt="stk" className="w-6 h-6 object-contain" />
+                        )}
+                        <span className="font-medium text-[#2C2825]">
+                          스티커 #{idx + 1} ({st.size}px)
+                        </span>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setStickers((prev) => prev.filter((s) => s.id !== st.id))}
+                        className="text-[#8C847D] hover:text-[#FF7675] p-1"
+                        title="삭제"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* 탭 4: 헤더 & 정보 탭 */}
         {activeTab === 'header' && (
           <div className="space-y-4 text-xs">
             <div>

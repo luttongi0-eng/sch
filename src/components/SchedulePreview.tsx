@@ -1,7 +1,7 @@
 'use client';
 
-import React from 'react';
-import { DaySchedule, ScheduleConfig } from '@/types/schedule';
+import React, { useState } from 'react';
+import { DaySchedule, ScheduleConfig, PlacedSticker } from '@/types/schedule';
 import { 
   Gamepad2, 
   Coffee, 
@@ -13,12 +13,17 @@ import {
   Calendar, 
   Radio, 
   Wifi, 
-  WifiOff 
+  WifiOff,
+  Trash2,
+  RotateCw
 } from 'lucide-react';
 
 interface PreviewProps {
   config: ScheduleConfig;
   days: DaySchedule[];
+  stickers?: PlacedSticker[];
+  onUpdateSticker?: (id: string, updates: Partial<PlacedSticker>) => void;
+  onRemoveSticker?: (id: string) => void;
   previewRef?: React.RefObject<HTMLDivElement | null>;
   showGridLines?: boolean;
   onUpdateDayCoords?: (dayId: string, x: number, y: number) => void;
@@ -28,11 +33,15 @@ interface PreviewProps {
 export const SchedulePreview: React.FC<PreviewProps> = ({
   config,
   days,
+  stickers = [],
+  onUpdateSticker,
+  onRemoveSticker,
   previewRef,
   showGridLines = false,
   onUpdateDayCoords,
   viewportScale = 1,
 }) => {
+  const [selectedStickerId, setSelectedStickerId] = useState<string | null>(null);
   const getIcon = (iconName?: string) => {
     switch (iconName) {
       case 'game':
@@ -871,6 +880,131 @@ export const SchedulePreview: React.FC<PreviewProps> = ({
             })}
           </main>
         )}
+
+        {/* ========================================================
+            5. 실시간 드래그 스티커 오버레이 레이어
+           ======================================================== */}
+        <div className="absolute inset-0 pointer-events-none z-40 overflow-hidden">
+          {stickers.map((st) => {
+            const isSelected = selectedStickerId === st.id;
+
+            return (
+              <div
+                key={st.id}
+                style={{
+                  position: 'absolute',
+                  left: `${st.x}px`,
+                  top: `${st.y}px`,
+                  width: `${st.size}px`,
+                  height: `${st.size}px`,
+                  transform: `rotate(${st.rotation || 0}deg)`,
+                  transformOrigin: 'center center',
+                  touchAction: 'none',
+                }}
+                className={`group pointer-events-auto select-none flex items-center justify-center cursor-grab active:cursor-grabbing ${
+                  isSelected ? 'ring-2 ring-[#FF7675] ring-offset-2 rounded-xl' : 'hover:ring-1 hover:ring-[#FF7675]/50 rounded-xl'
+                }`}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setSelectedStickerId(st.id);
+                }}
+                onPointerDown={(e) => {
+                  if (!onUpdateSticker) return;
+                  e.preventDefault();
+                  e.stopPropagation();
+                  setSelectedStickerId(st.id);
+
+                  const startX = e.clientX;
+                  const startY = e.clientY;
+                  const initX = st.x;
+                  const initY = st.y;
+                  const currentScale = viewportScale || 1;
+
+                  const handlePointerMove = (moveEvent: PointerEvent) => {
+                    const deltaX = (moveEvent.clientX - startX) / currentScale;
+                    const deltaY = (moveEvent.clientY - startY) / currentScale;
+                    const newX = Math.round(Math.max(0, Math.min(1920 - st.size, initX + deltaX)));
+                    const newY = Math.round(Math.max(0, Math.min(1080 - st.size, initY + deltaY)));
+                    onUpdateSticker(st.id, { x: newX, y: newY });
+                  };
+
+                  const handlePointerUp = () => {
+                    window.removeEventListener('pointermove', handlePointerMove);
+                    window.removeEventListener('pointerup', handlePointerUp);
+                  };
+
+                  window.addEventListener('pointermove', handlePointerMove);
+                  window.addEventListener('pointerup', handlePointerUp);
+                }}
+              >
+                {/* 스티커 컨텐츠 (이모지 또는 이미지) */}
+                {st.type === 'emoji' ? (
+                  <span
+                    style={{ fontSize: `${Math.round(st.size * 0.75)}px`, lineHeight: 1 }}
+                    className="drop-shadow-[0_2px_4px_rgba(0,0,0,0.15)]"
+                  >
+                    {st.content}
+                  </span>
+                ) : (
+                  <img
+                    src={st.content}
+                    alt="sticker"
+                    className="w-full h-full object-contain drop-shadow-[0_4px_8px_rgba(0,0,0,0.2)] pointer-events-none"
+                  />
+                )}
+
+                {/* 선택 시 조작 버튼 툴바 (삭제 & 회전) */}
+                {isSelected && (
+                  <div
+                    className="absolute -top-10 left-1/2 -translate-x-1/2 bg-[#2C2825] text-white px-2 py-1 rounded-full shadow-lg flex items-center gap-1.5 z-50 pointer-events-auto"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {/* 크기 줄이기 */}
+                    <button
+                      type="button"
+                      onClick={() => onUpdateSticker?.(st.id, { size: Math.max(30, st.size - 15) })}
+                      className="px-1.5 text-xs font-bold hover:text-[#FF7675]"
+                      title="크기 축소"
+                    >
+                      -
+                    </button>
+                    <span className="text-[10px] font-mono opacity-70">{st.size}px</span>
+                    {/* 크기 키우기 */}
+                    <button
+                      type="button"
+                      onClick={() => onUpdateSticker?.(st.id, { size: Math.min(300, st.size + 15) })}
+                      className="px-1.5 text-xs font-bold hover:text-[#55EFC4]"
+                      title="크기 확대"
+                    >
+                      +
+                    </button>
+                    {/* 15도 회전 */}
+                    <button
+                      type="button"
+                      onClick={() => onUpdateSticker?.(st.id, { rotation: ((st.rotation || 0) + 15) % 360 })}
+                      className="p-1 hover:text-[#74B9FF]"
+                      title="회전"
+                    >
+                      <RotateCw className="w-3 h-3" />
+                    </button>
+                    {/* 삭제 */}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        onRemoveSticker?.(st.id);
+                        setSelectedStickerId(null);
+                      }}
+                      className="p-1 hover:text-[#FF7675]"
+                      title="스티커 삭제"
+                    >
+                      <Trash2 className="w-3 h-3" />
+                    </button>
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
 
       </div>
     </div>

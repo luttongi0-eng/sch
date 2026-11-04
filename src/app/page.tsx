@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useRef, useEffect } from 'react';
-import { ScheduleConfig, DaySchedule } from '@/types/schedule';
+import { ScheduleConfig, DaySchedule, PlacedSticker } from '@/types/schedule';
 import { INITIAL_CONFIG, INITIAL_DAYS } from '@/data/constants';
 import { getWeekDates, applyCurrentWeekDates } from '@/utils/dateUtils';
 import { EditorSidebar } from '@/components/EditorSidebar';
@@ -14,12 +14,14 @@ import {
   RefreshCw, 
   Layers,
   Eye,
-  Sliders
+  Sliders,
+  Sticker
 } from 'lucide-react';
 
 export default function Home() {
   const [config, setConfig] = useState<ScheduleConfig>(INITIAL_CONFIG);
   const [days, setDays] = useState<DaySchedule[]>(INITIAL_DAYS);
+  const [stickers, setStickers] = useState<PlacedSticker[]>([]);
   const [zoomMode, setZoomMode] = useState<'fit' | '50' | '75' | '100'>('fit');
   const [showGridLines, setShowGridLines] = useState<boolean>(false);
   const [isExporting, setIsExporting] = useState<boolean>(false);
@@ -61,6 +63,11 @@ export default function Home() {
       } else {
         setDays(applyCurrentWeekDates(INITIAL_DAYS));
       }
+
+      const savedStickers = localStorage.getItem('crayoncast_stickers');
+      if (savedStickers) {
+        setStickers(JSON.parse(savedStickers));
+      }
     } catch (e) {
       console.warn('Failed to load saved schedule from localStorage:', e);
     } finally {
@@ -68,16 +75,17 @@ export default function Home() {
     }
   }, []);
 
-  // 2. config 또는 days 수정 시 localStorage에 실시간 자동 저장
+  // 2. config, days, stickers 수정 시 localStorage에 실시간 자동 저장
   useEffect(() => {
     if (!isLoaded) return;
     try {
       localStorage.setItem('crayoncast_config', JSON.stringify(config));
       localStorage.setItem('crayoncast_days', JSON.stringify(days));
+      localStorage.setItem('crayoncast_stickers', JSON.stringify(stickers));
     } catch (e) {
       console.warn('Failed to auto-save schedule to localStorage:', e);
     }
-  }, [config, days, isLoaded]);
+  }, [config, days, stickers, isLoaded]);
 
   // 전체 데이터 초기화 함수
   const handleResetToDefault = () => {
@@ -89,9 +97,11 @@ export default function Home() {
         weekNumber: weekInfo.weekNumber,
       });
       setDays(applyCurrentWeekDates(INITIAL_DAYS));
+      setStickers([]);
       try {
         localStorage.removeItem('crayoncast_config');
         localStorage.removeItem('crayoncast_days');
+        localStorage.removeItem('crayoncast_stickers');
       } catch (e) {
         // ignore
       }
@@ -260,6 +270,8 @@ export default function Home() {
             setConfig={setConfig}
             days={days}
             setDays={setDays}
+            stickers={stickers}
+            setStickers={setStickers}
           />
         </div>
 
@@ -336,6 +348,15 @@ export default function Home() {
                 <SchedulePreview
                   config={config}
                   days={days}
+                  stickers={stickers}
+                  onUpdateSticker={(id, updates) => {
+                    setStickers((prev) =>
+                      prev.map((s) => (s.id === id ? { ...s, ...updates } : s))
+                    );
+                  }}
+                  onRemoveSticker={(id) => {
+                    setStickers((prev) => prev.filter((s) => s.id !== id));
+                  }}
                   previewRef={previewCanvasRef}
                   showGridLines={showGridLines}
                   viewportScale={scale}

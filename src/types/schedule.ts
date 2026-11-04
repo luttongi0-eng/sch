@@ -81,3 +81,13 @@ export interface ScheduleConfig {
   diyShowCardBg?: boolean; // DIY 요일 박스에 반투명 배경 카드를 씌울지, 텍스트만 깔끔하게 올릴지 여부
   diyGlobalWidth?: number; // DIY 요일 박스 공통 너비
 }
+
+export interface PlacedSticker {
+  id: string;
+  type: 'emoji' | 'image';
+  content: string; // 이모지 문자(예: "⭐") 또는 Base64/PNG URL
+  x: number; // 0 ~ 1920
+  y: number; // 0 ~ 1080
+  size: number; // px 크기 (기본값 약 60 ~ 120)
+  rotation: number; // 각도 (-180 ~ 180 deg)
+}

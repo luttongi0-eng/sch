@@ -18,6 +18,25 @@ export interface FontOption {
   previewText: string;
 }
 
+export const PRESET_STICKERS = [
+  { id: 'sparkle', label: '반짝이', content: '✨', type: 'emoji' as const },
+  { id: 'star', label: '별', content: '⭐', type: 'emoji' as const },
+  { id: 'glowing_star', label: '빛나는별', content: '🌟', type: 'emoji' as const },
+  { id: 'moon', label: '달', content: '🌙', type: 'emoji' as const },
+  { id: 'cloud', label: '구름', content: '☁️', type: 'emoji' as const },
+  { id: 'heart', label: '하트', content: '💖', type: 'emoji' as const },
+  { id: 'fire', label: '불꽃', content: '🔥', type: 'emoji' as const },
+  { id: 'gamepad', label: '게임', content: '🎮', type: 'emoji' as const },
+  { id: 'headphones', label: '헤드셋', content: '🎧', type: 'emoji' as const },
+  { id: 'coffee', label: '커피', content: '☕', type: 'emoji' as const },
+  { id: 'mic', label: '마이크', content: '🎤', type: 'emoji' as const },
+  { id: 'clover', label: '네잎클로버', content: '🍀', type: 'emoji' as const },
+  { id: 'cat', label: '고양이', content: '🐱', type: 'emoji' as const },
+  { id: 'puppy', label: '강아지', content: '🐶', type: 'emoji' as const },
+  { id: 'ribbon', label: '리본', content: '🎀', type: 'emoji' as const },
+  { id: 'alarm', label: '종', content: '🔔', type: 'emoji' as const },
+];
+
 export const FONT_OPTIONS: FontOption[] = [
   {
     id: 'default',
