@@ -297,9 +297,11 @@ export const INITIAL_CONFIG: ScheduleConfig = {
   diyArtistX: 200,
   diyArtistY: 760,
   diyArtistPrefix: 'ARTIST.',
+  diyArtistFontSize: 20, // Artist 텍스트 기본 폰트 크기 (px)
   diyCustomImage: null,
   diyImageX: 180,
   diyImageY: 180,
   diyImageWidth: 580,
   diyImageHeight: 560,
+  diyImageFitMode: 'cover',
 };

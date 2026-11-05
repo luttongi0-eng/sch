@@ -640,25 +640,44 @@ export const EditorSidebar: React.FC<SidebarProps> = ({
                       />
                     </div>
                     {config.diyShowArtist !== false && (
-                      <div className="grid grid-cols-2 gap-2 pt-1">
-                        <div>
-                          <label className="block text-[10px] font-semibold text-[#5A544F] mb-0.5">접두사 라벨</label>
-                          <input
-                            type="text"
-                            value={config.diyArtistPrefix ?? 'ARTIST.'}
-                            onChange={(e) => setConfig((prev) => ({ ...prev, diyArtistPrefix: e.target.value }))}
-                            placeholder="ARTIST. 또는 Art By."
-                            className="w-full px-2.5 py-1 bg-white border border-[#E5DFD5] rounded-md text-xs font-bold text-[#2C2825] outline-none"
-                          />
+                      <div className="space-y-2 pt-1">
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <label className="block text-[10px] font-semibold text-[#5A544F] mb-0.5">접두사 라벨</label>
+                            <input
+                              type="text"
+                              value={config.diyArtistPrefix ?? 'ARTIST.'}
+                              onChange={(e) => setConfig((prev) => ({ ...prev, diyArtistPrefix: e.target.value }))}
+                              placeholder="ARTIST. 또는 Art By."
+                              className="w-full px-2.5 py-1 bg-white border border-[#E5DFD5] rounded-md text-xs font-bold text-[#2C2825] outline-none"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-[10px] font-semibold text-[#5A544F] mb-0.5">작가/그려주신분 이름</label>
+                            <input
+                              type="text"
+                              value={config.artByText || ''}
+                              onChange={(e) => setConfig((prev) => ({ ...prev, artByText: e.target.value }))}
+                              placeholder="이름 입력"
+                              className="w-full px-2.5 py-1 bg-white border border-[#E5DFD5] rounded-md text-xs font-bold text-[#2C2825] outline-none"
+                            />
+                          </div>
                         </div>
-                        <div>
-                          <label className="block text-[10px] font-semibold text-[#5A544F] mb-0.5">작가/그려주신분 이름</label>
+
+                        {/* 아티스트 글씨 크기 개별 조절 슬라이더 */}
+                        <div className="bg-white p-2 rounded-lg border border-[#E5DFD5]">
+                          <div className="flex justify-between items-center mb-1">
+                            <label className="text-[10px] font-bold text-[#2C2825]">아티스트 글씨 크기 개별 조절</label>
+                            <span className="text-[10px] font-mono text-[#FF7675] font-bold">{config.diyArtistFontSize || 20}px</span>
+                          </div>
                           <input
-                            type="text"
-                            value={config.artByText || ''}
-                            onChange={(e) => setConfig((prev) => ({ ...prev, artByText: e.target.value }))}
-                            placeholder="이름 입력"
-                            className="w-full px-2.5 py-1 bg-white border border-[#E5DFD5] rounded-md text-xs font-bold text-[#2C2825] outline-none"
+                            type="range"
+                            min="12"
+                            max="50"
+                            step="1"
+                            value={config.diyArtistFontSize || 20}
+                            onChange={(e) => setConfig((prev) => ({ ...prev, diyArtistFontSize: Number(e.target.value) }))}
+                            className="w-full h-1.5 bg-[#E5DFD5] rounded-lg appearance-none cursor-pointer accent-[#FF7675]"
                           />
                         </div>
                       </div>
@@ -703,36 +722,59 @@ export const EditorSidebar: React.FC<SidebarProps> = ({
                     />
 
                     {config.diyCustomImage && (
-                      <div className="grid grid-cols-2 gap-2 pt-1">
-                        <div>
-                          <div className="flex justify-between items-center mb-0.5">
-                            <label className="text-[10px] font-semibold text-[#5A544F]">사진 가로 크기</label>
-                            <span className="text-[10px] font-mono">{config.diyImageWidth || 580}px</span>
+                      <div className="space-y-2 pt-1">
+                        <div className="grid grid-cols-2 gap-2">
+                          <div>
+                            <div className="flex justify-between items-center mb-0.5">
+                              <label className="text-[10px] font-semibold text-[#5A544F]">사진 가로 너비</label>
+                              <span className="text-[10px] font-mono text-[#FF7675] font-bold">{config.diyImageWidth || 580}px</span>
+                            </div>
+                            <input
+                              type="range"
+                              min="100"
+                              max="1600"
+                              step="10"
+                              value={config.diyImageWidth || 580}
+                              onChange={(e) => setConfig((prev) => ({ ...prev, diyImageWidth: Number(e.target.value) }))}
+                              className="w-full h-1.5 bg-[#E5DFD5] rounded-lg appearance-none cursor-pointer accent-[#FF7675]"
+                            />
                           </div>
-                          <input
-                            type="range"
-                            min="200"
-                            max="1200"
-                            step="10"
-                            value={config.diyImageWidth || 580}
-                            onChange={(e) => setConfig((prev) => ({ ...prev, diyImageWidth: Number(e.target.value) }))}
-                            className="w-full h-1 bg-[#E5DFD5] rounded-lg appearance-none cursor-pointer accent-[#FF7675]"
-                          />
+                          <div>
+                            <div className="flex justify-between items-center mb-0.5">
+                              <label className="text-[10px] font-semibold text-[#5A544F]">사진 세로 높이</label>
+                              <span className="text-[10px] font-mono text-[#FF7675] font-bold">{config.diyImageHeight || 560}px</span>
+                            </div>
+                            <input
+                              type="range"
+                              min="100"
+                              max="1200"
+                              step="10"
+                              value={config.diyImageHeight || 560}
+                              onChange={(e) => setConfig((prev) => ({ ...prev, diyImageHeight: Number(e.target.value) }))}
+                              className="w-full h-1.5 bg-[#E5DFD5] rounded-lg appearance-none cursor-pointer accent-[#FF7675]"
+                            />
+                          </div>
                         </div>
-                        <div>
-                          <div className="flex justify-between items-center mb-0.5">
-                            <label className="text-[10px] font-semibold text-[#5A544F]">사진 세로 크기</label>
-                            <span className="text-[10px] font-mono">{config.diyImageHeight || 560}px</span>
+
+                        {/* 비율 맞춤 옵션 */}
+                        <div className="flex items-center justify-between bg-white px-2.5 py-1.5 rounded-lg border border-[#E5DFD5]">
+                          <span className="text-[10px] font-bold text-[#2C2825]">사진 채우기 방식</span>
+                          <div className="flex gap-1">
+                            {(['cover', 'contain', 'fill'] as const).map((mode) => (
+                              <button
+                                key={mode}
+                                type="button"
+                                onClick={() => setConfig((prev) => ({ ...prev, diyImageFitMode: mode }))}
+                                className={`px-2 py-0.5 rounded text-[10px] font-bold transition-all ${
+                                  (config.diyImageFitMode || 'cover') === mode
+                                    ? 'bg-[#2C2825] text-white'
+                                    : 'bg-[#F5F2EB] text-[#5A544F] hover:bg-[#E5DFD5]'
+                                }`}
+                              >
+                                {mode === 'cover' ? '꽉채움' : mode === 'contain' ? '원본비율' : '늘림'}
+                              </button>
+                            ))}
                           </div>
-                          <input
-                            type="range"
-                            min="200"
-                            max="1000"
-                            step="10"
-                            value={config.diyImageHeight || 560}
-                            onChange={(e) => setConfig((prev) => ({ ...prev, diyImageHeight: Number(e.target.value) }))}
-                            className="w-full h-1 bg-[#E5DFD5] rounded-lg appearance-none cursor-pointer accent-[#FF7675]"
-                          />
                         </div>
                       </div>
                     )}

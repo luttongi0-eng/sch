@@ -735,7 +735,10 @@ export const SchedulePreview: React.FC<PreviewProps> = ({
                 <img
                   src={config.diyCustomImage}
                   alt="DIY Custom Element"
-                  className="w-full h-full object-cover pointer-events-none"
+                  style={{
+                    objectFit: config.diyImageFitMode || 'cover',
+                  }}
+                  className="w-full h-full pointer-events-none"
                 />
               </div>
             )}
@@ -778,12 +781,25 @@ export const SchedulePreview: React.FC<PreviewProps> = ({
                 }}
                 className="group select-none px-4 py-2 rounded-xl transition-all hover:ring-1 hover:ring-[#FF7675]/60 hover:bg-white/10"
               >
-                <span className="font-black text-xl tracking-wider block text-current leading-tight">
-                  {config.diyArtistPrefix ?? 'ARTIST.'}
-                </span>
-                <span className="text-sm font-bold opacity-85 block mt-0.5">
-                  {config.artByText || '그려주신분 이름'}
-                </span>
+                {(() => {
+                  const baseSize = config.diyArtistFontSize || 20;
+                  return (
+                    <>
+                      <span
+                        className="font-black tracking-wider block text-current leading-tight"
+                        style={{ fontSize: `${baseSize}px` }}
+                      >
+                        {config.diyArtistPrefix ?? 'ARTIST.'}
+                      </span>
+                      <span
+                        className="font-bold opacity-85 block mt-0.5"
+                        style={{ fontSize: `${Math.round(baseSize * 0.7)}px` }}
+                      >
+                        {config.artByText || '그려주신분 이름'}
+                      </span>
+                    </>
+                  );
+                })()}
               </div>
             )}
 
