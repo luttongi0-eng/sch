@@ -347,6 +347,7 @@ export default function Home() {
               >
                 <SchedulePreview
                   config={config}
+                  setConfig={setConfig}
                   days={days}
                   stickers={stickers}
                   onUpdateSticker={(id, updates) => {

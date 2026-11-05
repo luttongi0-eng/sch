@@ -293,4 +293,13 @@ export const INITIAL_CONFIG: ScheduleConfig = {
   diyGlobalWidth: 460,
   diyShowDayBadge: false, // 틀에 이미 요일이 있으므로 기본적으로 요일 뱃지 숨김
   diyShowHeader: false, // 틀에 이미 헤더가 있으므로 기본적으로 상단 헤더 숨김
+  diyShowArtist: true, // DIY Artist 크레딧 박스 기본 활성화
+  diyArtistX: 200,
+  diyArtistY: 760,
+  diyArtistPrefix: 'ARTIST.',
+  diyCustomImage: null,
+  diyImageX: 180,
+  diyImageY: 180,
+  diyImageWidth: 580,
+  diyImageHeight: 560,
 };

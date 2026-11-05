@@ -82,6 +82,19 @@ export interface ScheduleConfig {
   diyGlobalWidth?: number; // DIY 요일 박스 공통 너비
   diyShowDayBadge?: boolean; // 요일 원형 뱃지 및 영문 요일명 표시 여부 (틀에 이미 요일이 적혀있는 경우 숨김)
   diyShowHeader?: boolean; // 상단 헤더(Weekly Schedule 타이틀, 기간/주차, 공지, 채널 태그) 표시 여부
+  
+  // DIY Artist 크레딧 드래그 박스 설정
+  diyShowArtist?: boolean; // Artist 박스 표시 여부
+  diyArtistX?: number; // Artist 박스 X 좌표
+  diyArtistY?: number; // Artist 박스 Y 좌표
+  diyArtistPrefix?: string; // "ARTIST." 또는 "Art By." 등 접두사
+  
+  // DIY 커스텀 삽입 이미지 (일러스트/캐릭터 사진 등) 드래그 박스 설정
+  diyCustomImage?: string | null; // 이미지 Base64/URL
+  diyImageX?: number; // 이미지 X 좌표
+  diyImageY?: number; // 이미지 Y 좌표
+  diyImageWidth?: number; // 이미지 너비
+  diyImageHeight?: number; // 이미지 높이
 }
 
 export interface PlacedSticker {

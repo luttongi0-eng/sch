@@ -625,6 +625,119 @@ export const EditorSidebar: React.FC<SidebarProps> = ({
                     />
                   </div>
 
+                  {/* ARTIST 크레딧 박스 토글 & 이름 설정 */}
+                  <div className="pt-2 border-t border-[#FF7675]/20 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <div>
+                        <span className="text-[11px] font-bold text-[#2C2825] block">ARTIST 이름 박스 표시</span>
+                        <span className="text-[9px] text-[#8C847D]">마우스로 원하는 위치로 자유롭게 드래그 가능</span>
+                      </div>
+                      <input
+                        type="checkbox"
+                        checked={config.diyShowArtist !== false}
+                        onChange={(e) => setConfig((prev) => ({ ...prev, diyShowArtist: e.target.checked }))}
+                        className="w-4 h-4 accent-[#2C2825] cursor-pointer"
+                      />
+                    </div>
+                    {config.diyShowArtist !== false && (
+                      <div className="grid grid-cols-2 gap-2 pt-1">
+                        <div>
+                          <label className="block text-[10px] font-semibold text-[#5A544F] mb-0.5">접두사 라벨</label>
+                          <input
+                            type="text"
+                            value={config.diyArtistPrefix ?? 'ARTIST.'}
+                            onChange={(e) => setConfig((prev) => ({ ...prev, diyArtistPrefix: e.target.value }))}
+                            placeholder="ARTIST. 또는 Art By."
+                            className="w-full px-2.5 py-1 bg-white border border-[#E5DFD5] rounded-md text-xs font-bold text-[#2C2825] outline-none"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-[10px] font-semibold text-[#5A544F] mb-0.5">작가/그려주신분 이름</label>
+                          <input
+                            type="text"
+                            value={config.artByText || ''}
+                            onChange={(e) => setConfig((prev) => ({ ...prev, artByText: e.target.value }))}
+                            placeholder="이름 입력"
+                            className="w-full px-2.5 py-1 bg-white border border-[#E5DFD5] rounded-md text-xs font-bold text-[#2C2825] outline-none"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* DIY 커스텀 이미지 (캐릭터/일러스트 사진) 별도 추가 기능 */}
+                  <div className="pt-2 border-t border-[#FF7675]/20 space-y-2">
+                    <div className="flex items-center justify-between">
+                      <span className="text-[11px] font-bold text-[#2C2825] block">틀 위에 얹을 일러스트/사진 추가</span>
+                      {config.diyCustomImage && (
+                        <button
+                          type="button"
+                          onClick={() => setConfig((prev) => ({ ...prev, diyCustomImage: null }))}
+                          className="text-[10px] text-[#FF7675] hover:underline font-bold"
+                        >
+                          사진 삭제
+                        </button>
+                      )}
+                    </div>
+                    <p className="text-[10px] text-[#8C847D]">
+                      틀 이미지 위에 스트리머 캐릭터나 일러스트를 올려서 마우스로 자유롭게 위치를 맞출 수 있습니다.
+                    </p>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          const reader = new FileReader();
+                          reader.onload = (event) => {
+                            setConfig((prev) => ({
+                              ...prev,
+                              diyCustomImage: event.target?.result as string,
+                            }));
+                          };
+                          reader.readAsDataURL(file);
+                          e.target.value = '';
+                        }
+                      }}
+                      className="text-xs text-[#5A544F] file:mr-2 file:py-1 file:px-2.5 file:rounded-md file:border-0 file:text-xs file:font-bold file:bg-[#2C2825] file:text-white cursor-pointer w-full"
+                    />
+
+                    {config.diyCustomImage && (
+                      <div className="grid grid-cols-2 gap-2 pt-1">
+                        <div>
+                          <div className="flex justify-between items-center mb-0.5">
+                            <label className="text-[10px] font-semibold text-[#5A544F]">사진 가로 크기</label>
+                            <span className="text-[10px] font-mono">{config.diyImageWidth || 580}px</span>
+                          </div>
+                          <input
+                            type="range"
+                            min="200"
+                            max="1200"
+                            step="10"
+                            value={config.diyImageWidth || 580}
+                            onChange={(e) => setConfig((prev) => ({ ...prev, diyImageWidth: Number(e.target.value) }))}
+                            className="w-full h-1 bg-[#E5DFD5] rounded-lg appearance-none cursor-pointer accent-[#FF7675]"
+                          />
+                        </div>
+                        <div>
+                          <div className="flex justify-between items-center mb-0.5">
+                            <label className="text-[10px] font-semibold text-[#5A544F]">사진 세로 크기</label>
+                            <span className="text-[10px] font-mono">{config.diyImageHeight || 560}px</span>
+                          </div>
+                          <input
+                            type="range"
+                            min="200"
+                            max="1000"
+                            step="10"
+                            value={config.diyImageHeight || 560}
+                            onChange={(e) => setConfig((prev) => ({ ...prev, diyImageHeight: Number(e.target.value) }))}
+                            className="w-full h-1 bg-[#E5DFD5] rounded-lg appearance-none cursor-pointer accent-[#FF7675]"
+                          />
+                        </div>
+                      </div>
+                    )}
+                  </div>
+
                   <div className="pt-2 border-t border-[#FF7675]/20">
                     <div className="flex justify-between items-center mb-1">
                       <label className="text-[11px] font-bold text-[#2C2825]">요일 박스 너비 조절</label>

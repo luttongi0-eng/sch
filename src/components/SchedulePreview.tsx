@@ -20,6 +20,7 @@ import {
 
 interface PreviewProps {
   config: ScheduleConfig;
+  setConfig?: React.Dispatch<React.SetStateAction<ScheduleConfig>>;
   days: DaySchedule[];
   stickers?: PlacedSticker[];
   onUpdateSticker?: (id: string, updates: Partial<PlacedSticker>) => void;
@@ -32,6 +33,7 @@ interface PreviewProps {
 
 export const SchedulePreview: React.FC<PreviewProps> = ({
   config,
+  setConfig,
   days,
   stickers = [],
   onUpdateSticker,
@@ -690,6 +692,102 @@ export const SchedulePreview: React.FC<PreviewProps> = ({
              커스텀 템플릿 DIY 자유 배치 모드 (Free Drag & Drop Layout)
              ======================================================== */
           <main className="absolute inset-0 pointer-events-auto">
+            {/* 1. DIY 자유 드래그 커스텀 삽입 이미지 (일러스트/캐릭터 사진) */}
+            {config.diyCustomImage && (
+              <div
+                style={{
+                  position: 'absolute',
+                  left: `${config.diyImageX ?? 180}px`,
+                  top: `${config.diyImageY ?? 180}px`,
+                  width: `${config.diyImageWidth ?? 580}px`,
+                  height: `${config.diyImageHeight ?? 560}px`,
+                  cursor: setConfig ? 'grab' : 'default',
+                  touchAction: 'none',
+                }}
+                onPointerDown={(e) => {
+                  if (!setConfig) return;
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const startX = e.clientX;
+                  const startY = e.clientY;
+                  const initX = config.diyImageX ?? 180;
+                  const initY = config.diyImageY ?? 180;
+                  const currentScale = viewportScale || 1;
+
+                  const handlePointerMove = (moveEvent: PointerEvent) => {
+                    const deltaX = (moveEvent.clientX - startX) / currentScale;
+                    const deltaY = (moveEvent.clientY - startY) / currentScale;
+                    const newX = Math.round(initX + deltaX);
+                    const newY = Math.round(initY + deltaY);
+                    setConfig((prev) => ({ ...prev, diyImageX: newX, diyImageY: newY }));
+                  };
+
+                  const handlePointerUp = () => {
+                    window.removeEventListener('pointermove', handlePointerMove);
+                    window.removeEventListener('pointerup', handlePointerUp);
+                  };
+
+                  window.addEventListener('pointermove', handlePointerMove);
+                  window.addEventListener('pointerup', handlePointerUp);
+                }}
+                className="group rounded-2xl overflow-hidden hover:ring-2 hover:ring-[#FF7675] transition-all select-none"
+              >
+                <img
+                  src={config.diyCustomImage}
+                  alt="DIY Custom Element"
+                  className="w-full h-full object-cover pointer-events-none"
+                />
+              </div>
+            )}
+
+            {/* 2. DIY 자유 드래그 ARTIST 크레딧 박스 */}
+            {config.diyShowArtist !== false && (
+              <div
+                style={{
+                  position: 'absolute',
+                  left: `${config.diyArtistX ?? 200}px`,
+                  top: `${config.diyArtistY ?? 760}px`,
+                  cursor: setConfig ? 'grab' : 'default',
+                  touchAction: 'none',
+                }}
+                onPointerDown={(e) => {
+                  if (!setConfig) return;
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const startX = e.clientX;
+                  const startY = e.clientY;
+                  const initX = config.diyArtistX ?? 200;
+                  const initY = config.diyArtistY ?? 760;
+                  const currentScale = viewportScale || 1;
+
+                  const handlePointerMove = (moveEvent: PointerEvent) => {
+                    const deltaX = (moveEvent.clientX - startX) / currentScale;
+                    const deltaY = (moveEvent.clientY - startY) / currentScale;
+                    const newX = Math.round(initX + deltaX);
+                    const newY = Math.round(initY + deltaY);
+                    setConfig((prev) => ({ ...prev, diyArtistX: newX, diyArtistY: newY }));
+                  };
+
+                  const handlePointerUp = () => {
+                    window.removeEventListener('pointermove', handlePointerMove);
+                    window.removeEventListener('pointerup', handlePointerUp);
+                  };
+
+                  window.addEventListener('pointermove', handlePointerMove);
+                  window.addEventListener('pointerup', handlePointerUp);
+                }}
+                className="group select-none px-4 py-2 rounded-xl transition-all hover:ring-1 hover:ring-[#FF7675]/60 hover:bg-white/10"
+              >
+                <span className="font-black text-xl tracking-wider block text-current leading-tight">
+                  {config.diyArtistPrefix ?? 'ARTIST.'}
+                </span>
+                <span className="text-sm font-bold opacity-85 block mt-0.5">
+                  {config.artByText || '그려주신분 이름'}
+                </span>
+              </div>
+            )}
+
+            {/* 3. 7개 요일 일정 바 리스트 드래그 */}
             {days.map((day) => {
               const x = day.diyX ?? 1000;
               const y = day.diyY ?? 200;
