@@ -791,7 +791,7 @@ export const SchedulePreview: React.FC<PreviewProps> = ({
             {days.map((day) => {
               const x = day.diyX ?? 1000;
               const y = day.diyY ?? 200;
-              const boxWidth = day.diyWidth || config.diyGlobalWidth || 460;
+              const boxWidth = config.diyGlobalWidth || day.diyWidth || 460;
               const isSpecialDark = !!day.customBgColor;
 
               return (
