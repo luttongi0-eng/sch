@@ -889,8 +889,11 @@ export const SchedulePreview: React.FC<PreviewProps> = ({
                       )}
                     </div>
 
-                    {/* 방송 시간 */}
-                    <div className="shrink-0 font-mono font-black text-xs tracking-tight text-right min-w-[60px]">
+                    {/* 방송 시간 또는 휴방 표기 */}
+                    <div
+                      className="shrink-0 font-bold tracking-tight text-right whitespace-nowrap pl-2"
+                      style={fs(14)}
+                    >
                       {day.time}
                     </div>
                   </div>
